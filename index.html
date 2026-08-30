@@ -1111,6 +1111,7 @@
     try{
       mediaStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } } });
       video.srcObject = mediaStream;
+      try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
     }catch(err){
       stopScan();
       hint.textContent = (err && err.name === 'NotAllowedError')
