@@ -233,64 +233,33 @@
 
   /* ---------- recalls ---------- */
   .recalls{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
-  .recalls-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-  }
-  .recalls-head h3{
+  .recalls h3{
     font-family:'Space Grotesk',sans-serif;
     font-weight:600;
     font-size:16px;
     letter-spacing:.01em;
-    margin:0;
+    margin:0 0 12px;
     color:var(--text);
   }
-  .recall-toggle{
-    font-family:'JetBrains Mono',monospace;
+  .recall-cta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    text-decoration:none;
+    font-family:'Space Grotesk',sans-serif;
     font-weight:600;
-    font-size:11px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
+    font-size:15px;
     color:var(--danger);
     background:var(--danger-dim);
     border:1px solid rgba(251,113,133,.35);
-    padding:6px 12px;
-    border-radius:999px;
-    white-space:nowrap;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .recall-toggle:hover{border-color:var(--danger)}
-  .recall-toggle .chevron{display:inline-block;transition:transform .15s ease;font-size:9px}
-  .recall-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}
-  #recallList{margin-top:14px}
-  .recall-item{
-    border-left:3px solid var(--danger);
-    background:var(--panel-2);
-    border-radius:0 var(--radius-sm) var(--radius-sm) 0;
-    padding:12px 14px;
-    margin-bottom:10px;
-  }
-  .recall-item .rc-head{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    color:var(--text-faint);
-    margin-bottom:6px;
-  }
-  .recall-item .rc-component{font-weight:700;color:var(--text)}
-  .recall-item p{margin:4px 0;font-size:13.5px;line-height:1.55;color:var(--text-soft)}
-  .recall-item p strong{color:var(--text);font-weight:600}
-  .recall-none,.recall-loading{color:var(--text-soft);font-size:13.5px;padding:6px 0}
-  .recall-link{font-size:12px;color:var(--text-faint);margin-top:14px}
-  .recall-link a{color:var(--accent)}
+  .recall-cta:hover{border-color:var(--danger);box-shadow:0 0 0 4px rgba(251,113,133,.12)}
+  .recall-cta .arrow{font-size:18px}
+  .recall-sub{font-size:12px;color:var(--text-faint);margin:10px 0 0}
 
   /* ---------- scanner (barcode + photo) ---------- */
   #scan,#photo{
@@ -594,14 +563,12 @@
     <dl class="specs" id="specs"></dl>
 
     <div class="recalls" id="recalls" hidden>
-      <div class="recalls-head">
-        <h3>Recalls</h3>
-        <button class="recall-toggle" id="recallCount" type="button" hidden aria-expanded="false">
-          <span id="recallCountLabel"></span><span class="chevron" aria-hidden="true">&#9662;</span>
-        </button>
-      </div>
-      <div id="recallList" hidden></div>
-      <p class="recall-link" id="recallLink" hidden>Source: NHTSA, matched by make/model/year — <a href="https://www.nhtsa.gov/recalls" target="_blank" rel="noopener">double-check at nhtsa.gov</a> for VIN-exact results.</p>
+      <h3>Recalls</h3>
+      <a class="recall-cta" id="recallCta" href="#" target="_blank" rel="noopener">
+        <span>Check open recalls for this VIN</span>
+        <span class="arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <p class="recall-sub">Opens NHTSA's official VIN lookup in a new tab — the only source for real unrepaired-recall status.</p>
     </div>
 
     <div class="meta-row">
@@ -678,10 +645,7 @@
   const toast    = document.getElementById('toast');
   const savelogBtn = document.getElementById('savelog');
   const recallsSec = document.getElementById('recalls');
-  const recallList = document.getElementById('recallList');
-  const recallCount = document.getElementById('recallCount');
-  const recallCountLabel = document.getElementById('recallCountLabel');
-  const recallLink = document.getElementById('recallLink');
+  const recallCta = document.getElementById('recallCta');
 
   let current = null;
 
@@ -831,81 +795,8 @@
     results.classList.add('shown');
     savelogBtn.disabled = false;
     syncOdo();
-    fetchRecalls(r.Make, r.Model, r.ModelYear);
-  }
-
-  /* --- recalls --- */
-  function addRecallLine(container, label, value){
-    if(!value) return;
-    const p = document.createElement('p');
-    if(label){
-      const strong = document.createElement('strong');
-      strong.textContent = label + ': ';
-      p.append(strong, document.createTextNode(value));
-    } else {
-      p.textContent = value;
-    }
-    container.append(p);
-  }
-
-  function setRecallsOpen(open){
-    recallCount.setAttribute('aria-expanded', String(open));
-    recallList.hidden = !open;
-    recallLink.hidden = !open;
-  }
-
-  recallCount.addEventListener('click', () => {
-    setRecallsOpen(recallCount.getAttribute('aria-expanded') !== 'true');
-  });
-
-  async function fetchRecalls(make, model, year){
-    if(!make || !model || !year) { recallsSec.hidden = true; return; }
     recallsSec.hidden = false;
-    recallCount.hidden = true;
-    recallList.hidden = false;
-    recallLink.hidden = true;
-    recallList.innerHTML = '<p class="recall-loading">Checking NHTSA for open recalls…</p>';
-    try{
-      const url = 'https://api.nhtsa.gov/recalls/recallsByVehicle?make=' + encodeURIComponent(make)
-        + '&model=' + encodeURIComponent(model) + '&modelYear=' + encodeURIComponent(year);
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('status ' + res.status);
-      const data = await res.json();
-      const items = data.results || [];
-      if(!items.length){
-        recallList.innerHTML = '<p class="recall-none">No open NHTSA recalls found for this make, model, and year.</p>';
-        return;
-      }
-      recallCount.hidden = false;
-      recallCountLabel.textContent = items.length + (items.length === 1 ? ' recall' : ' recalls');
-      setRecallsOpen(false);
-      recallList.innerHTML = '';
-      items.forEach(r => {
-        const item = document.createElement('div');
-        item.className = 'recall-item';
-        const head = document.createElement('div');
-        head.className = 'rc-head';
-        const comp = document.createElement('span');
-        comp.className = 'rc-component';
-        comp.textContent = r.Component || 'Recall';
-        const date = document.createElement('span');
-        date.textContent = r.ReportReceivedDate || '';
-        head.append(comp, date);
-        item.append(head);
-        addRecallLine(item, null, r.Summary);
-        addRecallLine(item, 'Risk', r.Consequence);
-        addRecallLine(item, 'Fix', r.Remedy);
-        if(r.NHTSACampaignNumber){
-          const p = document.createElement('p');
-          p.style.cssText = 'color:var(--ink-soft);font-size:11px';
-          p.textContent = 'NHTSA Campaign #' + r.NHTSACampaignNumber;
-          item.append(p);
-        }
-        recallList.append(item);
-      });
-    }catch(err){
-      recallList.innerHTML = '<p class="recall-none">Could not check recalls right now — try again, or search your VIN directly at nhtsa.gov/recalls.</p>';
-    }
+    recallCta.href = 'https://www.nhtsa.gov/recalls?vymm=' + encodeURIComponent(v);
   }
 
   /* --- summary --- */
@@ -947,9 +838,7 @@
     vin.value = ''; miles.value = ''; trimIn.value = ''; current = null;
     results.classList.remove('shown');
     specs.innerHTML = ''; summary.textContent = '';
-    recallsSec.hidden = true; recallList.innerHTML = ''; recallList.hidden = true;
-    recallCount.hidden = true; recallCount.setAttribute('aria-expanded', 'false');
-    recallLink.hidden = true;
+    recallsSec.hidden = true;
     savelogBtn.disabled = true;
     syncVin(); syncOdo(); vin.focus();
   });
