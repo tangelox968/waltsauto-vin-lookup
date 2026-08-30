@@ -434,6 +434,23 @@
   .ghost:hover{border-color:var(--accent);color:var(--accent-strong)}
   .ghost:disabled{opacity:.4;cursor:not-allowed;border-color:var(--border);color:var(--text-faint)}
   .ghost.small{padding:7px 14px;font-size:12.5px}
+  .sync-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    cursor:pointer;
+  }
+  .sync-toggle input{
+    width:16px;height:16px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .sync-toggle[hidden]{display:none}
   .summary{
     margin-top:18px;
     background:var(--panel-2);
@@ -611,6 +628,10 @@
 
     <div class="actions">
       <button class="ghost" id="savelog" type="button" disabled>Save to Sheet</button>
+      <label class="sync-toggle" id="syncToggleWrap" hidden>
+        <input type="checkbox" id="syncToggle" checked>
+        <span>Sync this one to Sheet</span>
+      </label>
       <button class="ghost" id="copy" type="button">Copy summary</button>
       <button class="ghost" id="print" type="button">Print</button>
       <button class="ghost" id="reset" type="button">Clear</button>
@@ -664,6 +685,8 @@
   const summary  = document.getElementById('summary');
   const toast    = document.getElementById('toast');
   const savelogBtn = document.getElementById('savelog');
+  const syncToggle = document.getElementById('syncToggle');
+  const syncToggleWrap = document.getElementById('syncToggleWrap');
   const recallsSec = document.getElementById('recalls');
   const recallCta = document.getElementById('recallCta');
 
@@ -885,7 +908,8 @@
   function renderLog(){
     const q = loadQueue();
     const hasUrl = !!getSheetUrl();
-    const pending = q.filter(e => !e.sent).length;
+    syncToggleWrap.hidden = !hasUrl;
+    const pending = q.filter(e => !e.sent && !e.skip).length;
 
     if(!q.length){
       logList.innerHTML = '<p class="logempty">No entries saved yet on this phone.</p>';
@@ -898,8 +922,8 @@
         who.className = 'who';
         who.textContent = [e.year, e.make, e.model].filter(Boolean).join(' ') + ' — ' + e.vin;
         const status = document.createElement('span');
-        status.className = 'status ' + (e.sent ? 'sent' : 'pending');
-        status.textContent = e.sent ? 'Synced' : (hasUrl ? 'Pending' : 'Local only');
+        status.className = 'status ' + (e.sent ? 'sent' : (e.skip ? 'skipped' : 'pending'));
+        status.textContent = e.sent ? 'Synced' : (e.skip ? 'Local only' : (hasUrl ? 'Pending' : 'Local only'));
         row.append(who, status);
         logList.append(row);
       });
@@ -907,7 +931,7 @@
 
     logStatus.textContent = !hasUrl
       ? q.length + ' saved on this phone — add a Sheet URL in "Sheet setup" to sync automatically.'
-      : (pending > 0 ? pending + ' waiting to sync…' : (q.length ? 'All entries synced to your Sheet.' : 'No entries saved yet on this phone.'));
+      : (pending > 0 ? pending + ' waiting to sync…' : (q.length ? 'All synced (or kept local by choice).' : 'No entries saved yet on this phone.'));
 
     retryBtn.hidden = !(hasUrl && pending > 0);
   }
@@ -918,7 +942,7 @@
     const q = loadQueue();
     let changed = false;
     for(const entry of q){
-      if(entry.sent) continue;
+      if(entry.sent || entry.skip) continue;
       try{
         await fetch(url, {
           method:'POST',
@@ -938,6 +962,8 @@
 
   savelogBtn.addEventListener('click', () => {
     if(!current) return;
+    const hasUrl = !!getSheetUrl();
+    const skip = hasUrl && !syncToggle.checked;
     const entry = {
       id: Date.now() + '-' + Math.random().toString(36).slice(2,8),
       ts: new Date().toISOString(),
@@ -951,13 +977,14 @@
       drive: current.drive,
       miles: miles.value.replace(/\D/g,''),
       checkOk: checkDigitValid(current.vin),
-      sent: false
+      sent: false,
+      skip: skip
     };
     const q = loadQueue();
     q.unshift(entry);
     saveQueue(q);
     renderLog();
-    flashToast('Saved to field log');
+    flashToast(skip ? 'Saved to this phone only' : 'Saved to field log');
     flushQueue();
   });
 
