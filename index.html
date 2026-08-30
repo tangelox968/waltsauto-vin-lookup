@@ -273,13 +273,15 @@
   #scan[hidden],#photo[hidden]{display:none}
   .scanner{
     display:none;
-    margin-top:16px;
-    background:#000;
-    border-radius:var(--radius);
-    padding:10px;
-    border:1px solid var(--border);
   }
-  .scanner.open{display:block}
+  .scanner.open{
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:#000;
+  }
   .viewport{
     position:relative;
     width:100%;
@@ -288,6 +290,17 @@
     background:#000;
     border-radius:var(--radius-sm);
     overflow:hidden;
+    margin:0 auto;
+  }
+  .scanner.open .viewport{
+    flex:1 1 auto;
+    width:100%;
+    max-width:none;
+    height:100%;
+    aspect-ratio:auto;
+    border-radius:0;
+    margin:0;
+    min-height:0;
   }
   .viewport video{width:100%;height:100%;object-fit:cover;display:block}
   .aim{
@@ -307,6 +320,12 @@
     flex-wrap:wrap;
     margin-top:10px;
   }
+  .scanner.open .scan-bar{
+    flex:0 0 auto;
+    margin-top:0;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    background:linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.65) 75%, transparent);
+  }
   .scan-note{
     font-family:'JetBrains Mono',monospace;
     font-size:11px;
@@ -314,12 +333,13 @@
     text-transform:uppercase;
     color:var(--text-faint);
   }
+  .scanner.open .scan-note{color:var(--text)}
   .scan-buttons{display:flex;gap:10px;flex-wrap:wrap}
   #capture{
     background:var(--accent);
     color:var(--accent-ink);
     border:1px solid var(--accent);
-    padding:8px 18px;
+    padding:12px 22px;
   }
   #capture:hover{box-shadow:0 0 0 4px var(--accent-dim)}
   #capture:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
@@ -328,7 +348,7 @@
     background:transparent;
     color:var(--text-soft);
     border:1px solid var(--border-strong);
-    padding:8px 18px;
+    padding:12px 22px;
   }
   #stopscan:hover{border-color:var(--text-soft);color:var(--text)}
   .meta-row{
@@ -1013,6 +1033,7 @@
     if(reader){ reader.reset(); reader = null; }
     if(mediaStream){ mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; video.srcObject = null; }
     scanner.classList.remove('open');
+    document.body.style.overflow = '';
     scanBtn.textContent = 'Scan';
     photoBtn.textContent = 'Photo';
     captureBtn.hidden = true;
@@ -1032,6 +1053,7 @@
 
     reader = new ZXing.BrowserMultiFormatReader(hints);
     scanner.classList.add('open');
+    document.body.style.overflow = 'hidden';
     scanBtn.textContent = 'Close';
     scanNote.textContent = 'Hold the barcode across the red line';
     captureBtn.hidden = true;
@@ -1069,6 +1091,7 @@
     if(mediaStream){ stopScan(); return; }
     if(reader) stopScan();
     scanner.classList.add('open');
+    document.body.style.overflow = 'hidden';
     photoBtn.textContent = 'Close';
     scanNote.textContent = 'No barcode? Center the VIN text, then tap Capture';
     captureBtn.hidden = false;
