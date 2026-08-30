@@ -566,7 +566,7 @@
       </div>
       <canvas id="shot" hidden></canvas>
       <div class="scan-bar">
-        <span class="scan-note" id="scan-note">Hold the barcode across the red line</span>
+        <span class="scan-note" id="scan-note">Hold the barcode in view — any direction works</span>
         <div class="scan-buttons">
           <button id="capture" type="button" hidden>Capture</button>
           <button id="stopscan" type="button">Cancel</button>
@@ -1029,7 +1029,31 @@
     hint.className = 'hint warn';
   }
 
+  const scanCanvas = document.createElement('canvas');
+  let scanTimer = null;
+
+  function rotateCanvas(src, degrees){
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    if(degrees === 90 || degrees === 270){ c.width = src.height; c.height = src.width; }
+    else { c.width = src.width; c.height = src.height; }
+    ctx.translate(c.width / 2, c.height / 2);
+    ctx.rotate(degrees * Math.PI / 180);
+    ctx.drawImage(src, -src.width / 2, -src.height / 2);
+    return c;
+  }
+
+  // Bypasses BrowserMultiFormatReader's element-type sizing (it only sizes
+  // capture canvases for <video>/<img>, not <canvas>), so a canvas we've
+  // already rotated ourselves decodes at its own size instead of 0x0.
+  function decodeCanvas(canvas, rdr){
+    const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+    const binarizer = new ZXing.HybridBinarizer(luminanceSource);
+    return rdr.decodeBitmap(new ZXing.BinaryBitmap(binarizer));
+  }
+
   function stopScan(){
+    if(scanTimer){ clearTimeout(scanTimer); scanTimer = null; }
     if(reader){ reader.reset(); reader = null; }
     if(mediaStream){ mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; video.srcObject = null; }
     scanner.classList.remove('open');
@@ -1038,6 +1062,41 @@
     photoBtn.textContent = 'Photo';
     captureBtn.hidden = true;
     captureBtn.disabled = false;
+  }
+
+  function handleScanResult(result){
+    const text = result.getText().toUpperCase().replace(/[^A-Z0-9]/g,'');
+    const match = text.match(VIN_RE);
+    if(!match){
+      scanNote.textContent = 'Read a barcode, but no VIN in it — try the other label';
+      return false;
+    }
+    vin.value = cleanVin(match[0]);
+    stopScan();
+    syncVin();
+    if(vin.value.length === 17) run();
+    return true;
+  }
+
+  // Vertically-printed door-jamb barcodes never line up with a horizontal
+  // scan line no matter how the phone is held, so instead of relying on the
+  // user to rotate the camera, each frame is also tried rotated 90/270.
+  function scanLoop(){
+    if(!mediaStream || !reader) return;
+    if(video.videoWidth){
+      scanCanvas.width = video.videoWidth;
+      scanCanvas.height = video.videoHeight;
+      scanCanvas.getContext('2d').drawImage(video, 0, 0);
+      for(const angle of [0, 90, 270]){
+        try{
+          const cvs = angle === 0 ? scanCanvas : rotateCanvas(scanCanvas, angle);
+          const result = decodeCanvas(cvs, reader);
+          if(handleScanResult(result)) return;
+          break;
+        }catch(err){ /* nothing found at this angle — try the next */ }
+      }
+    }
+    scanTimer = setTimeout(scanLoop, 300);
   }
 
   async function startScan(){
@@ -1055,29 +1114,16 @@
     scanner.classList.add('open');
     document.body.style.overflow = 'hidden';
     scanBtn.textContent = 'Close';
-    scanNote.textContent = 'Hold the barcode across the red line';
+    scanNote.textContent = 'Hold the barcode in view — any direction works';
     captureBtn.hidden = true;
     hint.textContent = '';
     hint.className = 'hint';
 
     try{
-      await reader.decodeFromConstraints(
-        { video:{ facingMode:{ ideal:'environment' } } },
-        video,
-        (result) => {
-          if(!result) return;
-          const text = result.getText().toUpperCase().replace(/[^A-Z0-9]/g,'');
-          const match = text.match(VIN_RE);
-          if(!match){
-            scanNote.textContent = 'Read a barcode, but no VIN in it — try the other label';
-            return;
-          }
-          vin.value = cleanVin(match[0]);
-          stopScan();
-          syncVin();
-          if(vin.value.length === 17) run();
-        }
-      );
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } } });
+      video.srcObject = mediaStream;
+      try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
+      scanLoop();
     }catch(err){
       stopScan();
       hint.textContent = (err && err.name === 'NotAllowedError')
@@ -1088,7 +1134,7 @@
   }
 
   async function startPhoto(){
-    if(mediaStream){ stopScan(); return; }
+    if(mediaStream && !reader){ stopScan(); return; }
     if(reader) stopScan();
     scanner.classList.add('open');
     document.body.style.overflow = 'hidden';
