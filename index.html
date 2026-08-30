@@ -131,26 +131,40 @@
     border-radius: 16px;
     padding: 20px;
     margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .recalls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .recalls-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 18px;
     font-weight: 700;
-    margin: 0 0 16px 0;
+    margin: 0;
     color: #ffffff;
   }
-  .recall-frame-container {
-    width: 100%;
-    height: 500px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #ffffff;
-    border: 1px solid var(--card-border);
+  .recall-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #e11d48;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s;
   }
-  .recall-frame {
-    width: 100%;
-    height: 100%;
-    border: none;
+  .recall-link-btn:hover {
+    background: #be123c;
   }
 
   .meta-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-top: 16px; }
@@ -188,7 +202,7 @@
   <header class="masthead">
     <div class="lockup-wrap">
       <h1 class="lockup">Walt's Auto</h1>
-      <span class="eyebrow">San Angelo, TX &middot; VIN Lookup & Recall Checker</span>
+      <span class="eyebrow">San Angelo, TX &middot; VIN Lookup</span>
     </div>
   </header>
 
@@ -203,7 +217,7 @@
     
     <div class="action-row">
       <button class="action-btn" id="scan" type="button" hidden>📷 Scan</button>
-      <button class="action-btn" id="decode" type="button" disabled>Decode & Check Recalls</button>
+      <button class="action-btn" id="decode" type="button" disabled>Decode VIN</button>
     </div>
     <p class="hint" id="vin-hint" role="status">Type or paste the VIN off the door jamb, dash, or title.</p>
 
@@ -228,9 +242,14 @@
     <dl class="specs" id="specs"></dl>
 
     <div class="recalls-card">
-      <h3 class="recalls-title">Safety Recalls (NHTSA Direct Lookup)</h3>
-      <div class="recall-frame-container">
-        <iframe id="recall-frame" class="recall-frame" src="about:blank" title="NHTSA Recalls"></iframe>
+      <div class="recalls-header">
+        <div>
+          <h3 class="recalls-title">Safety Recalls</h3>
+          <span style="font-size: 13px; color: var(--text-secondary);">Check for unaddressed safety recalls on NHTSA.gov</span>
+        </div>
+        <a id="recall-btn" class="recall-link-btn" href="#" target="_blank" rel="noopener noreferrer">
+          Check NHTSA Recalls &rarr;
+        </a>
       </div>
     </div>
 
@@ -280,7 +299,7 @@
   const digits   = Array.from(odo.querySelectorAll('.digit'));
   const summary  = document.getElementById('summary');
   const toast    = document.getElementById('toast');
-  const recallFrame = document.getElementById('recall-frame');
+  const recallBtn= document.getElementById('recall-btn');
 
   let current = null;
 
@@ -356,7 +375,7 @@
     const v = vin.value;
     decodeBtn.disabled = true;
     decodeBtn.textContent = 'Reading...';
-    hint.textContent = 'Checking vehicle specs and recall data...';
+    hint.textContent = 'Checking vehicle specs...';
     hint.className = 'hint';
     try{
       const res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + v + '?format=json');
@@ -366,8 +385,8 @@
       if(!r || (!r.Make && !r.ModelYear)) throw new Error('empty');
       render(v, r);
       
-      // Load official NHTSA recall page in the frame using the decoded VIN
-      recallFrame.src = 'https://www.nhtsa.gov/recalls?vin=' + encodeURIComponent(v);
+      // Update link to open official NHTSA recall database with current VIN
+      recallBtn.href = 'https://www.nhtsa.gov/recalls?vin=' + encodeURIComponent(v);
       
       hint.textContent = '';
     }catch(err){
@@ -377,7 +396,7 @@
         : 'Could not connect to database. Check internet connection.';
       hint.className = 'hint warn';
     }finally{
-      decodeBtn.textContent = 'Decode & Check Recalls';
+      decodeBtn.textContent = 'Decode VIN';
       decodeBtn.disabled = vin.value.length !== 17;
     }
   }
@@ -465,7 +484,7 @@
     vin.value = ''; miles.value = ''; trimIn.value = ''; current = null;
     results.classList.remove('shown');
     specs.innerHTML = ''; summary.textContent = '';
-    recallFrame.src = 'about:blank';
+    recallBtn.href = '#';
     syncVin(); syncOdo(); vin.focus();
   });
 
