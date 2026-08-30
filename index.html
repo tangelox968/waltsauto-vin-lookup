@@ -21,7 +21,6 @@
     --accent-glow: #10b981;
     --accent-glow-bg: rgba(16, 185, 129, 0.15);
     --accent-red: #ef4444;
-    --accent-red-bg: rgba(239, 68, 68, 0.15);
     --btn-bg: #1e293b;
     --btn-hover: #334155;
     --pad: clamp(16px, 4vw, 32px);
@@ -57,11 +56,7 @@
     margin: 0;
     color: #ffffff;
   }
-  .eyebrow {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-  }
+  .eyebrow { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
   .entry {
     background: var(--card-bg);
@@ -93,40 +88,22 @@
     text-transform: uppercase;
     color: #ffffff;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-    transition: border-color 0.2s, box-shadow 0.2s;
   }
   #vin::placeholder { color: #475569; letter-spacing: 0.1em; }
   #vin:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
   
   .count {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--text-secondary);
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary);
   }
   .count.full { color: #38bdf8; font-weight: 700; }
 
   .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
   button.action-btn {
-    flex: 1;
-    min-width: 100px;
-    padding: 12px 16px;
-    background: var(--btn-bg);
-    color: #ffffff;
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s;
+    flex: 1; min-width: 100px; padding: 12px 16px;
+    background: var(--btn-bg); color: #ffffff; border: 1px solid var(--card-border);
+    border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   button.action-btn:hover:not(:disabled) { background: var(--btn-hover); }
   button.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -139,182 +116,32 @@
 
   .results { margin-top: 24px; display: none; }
   .results.shown { display: block; }
-  .results-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .headline {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: clamp(22px, 5vw, 32px);
-    margin: 0;
-    color: #ffffff;
-  }
-  .stamp {
-    background: var(--accent-glow-bg);
-    color: var(--accent-glow);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-  }
+  .results-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+  .headline { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: clamp(22px, 5vw, 32px); margin: 0; color: #ffffff; }
+  .stamp { background: var(--accent-glow-bg); color: var(--accent-glow); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-  dl.specs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin: 0 0 24px 0;
-  }
-  .spec {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .spec dt {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
+  dl.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0 0 24px 0; }
+  .spec { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .spec dt { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 6px; }
   .spec dd { margin: 0; font-size: 15px; font-weight: 600; color: #ffffff; word-break: break-word; }
 
-  .recalls-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 24px;
-  }
-  .recalls-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .recalls-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-    color: #ffffff;
-  }
-  .badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .badge.none { background: var(--accent-glow-bg); color: var(--accent-glow); border: 1px solid rgba(16, 185, 129, 0.3); }
-  .badge.found { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
-
-  .recall-item {
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-  .recall-item:last-child { margin-bottom: 0; }
-  .recall-name {
-    font-weight: 700;
-    font-size: 15px;
-    color: #f8fafc;
-    margin: 0 0 8px 0;
-  }
-  .recall-detail {
-    font-size: 13px;
-    color: #cbd5e1;
-    line-height: 1.5;
-    margin: 4px 0;
-  }
-  .recall-meta {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-top: 8px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .meta-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 16px;
-  }
+  .meta-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-top: 16px; }
   .meta-row { display: flex; gap: 20px; flex-wrap: wrap; }
   .odo-block, .trim-block { flex: 1; min-width: 200px; }
   
-  .text-field {
-    width: 100%;
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    color: #ffffff;
-  }
+  .text-field { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; font-family: 'Inter', sans-serif; font-size: 15px; color: #ffffff; }
   .text-field:focus { outline: none; border-color: #38bdf8; }
 
-  .odo {
-    display: inline-flex;
-    gap: 4px;
-    padding: 8px;
-    background: #000000;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    position: relative;
-  }
-  .digit {
-    width: 28px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1e293b;
-    color: #ffffff;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 20px;
-    border-radius: 4px;
-  }
+  .odo { display: inline-flex; gap: 4px; padding: 8px; background: #000000; border-radius: 8px; border: 1px solid #334155; position: relative; }
+  .digit { width: 28px; height: 36px; display: flex; align-items: center; justify-content: center; background: #1e293b; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 20px; border-radius: 4px; }
   .digit.lead { color: #475569; }
   .digit.tenth { background: #331010; color: var(--accent-red); }
   #miles { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: text; }
 
   .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .ghost {
-    background: var(--btn-bg);
-    color: #ffffff;
-    border: 1px solid var(--card-border);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  .ghost { background: var(--btn-bg); color: #ffffff; border: 1px solid var(--card-border); padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; }
   .ghost:hover { background: var(--btn-hover); }
-  .summary {
-    margin-top: 16px;
-    background: #0f172a;
-    border-left: 4px solid #38bdf8;
-    border-radius: 0 8px 8px 0;
-    padding: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: #cbd5e1;
-    word-break: break-word;
-  }
+  .summary { margin-top: 16px; background: #0f172a; border-left: 4px solid #38bdf8; border-radius: 0 8px 8px 0; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #cbd5e1; word-break: break-word; }
   .toast { font-size: 13px; color: var(--accent-glow); opacity: 0; transition: opacity 0.2s; }
   .toast.on { opacity: 1; }
 
@@ -333,7 +160,7 @@
   <header class="masthead">
     <div class="lockup-wrap">
       <h1 class="lockup">Walt's Auto</h1>
-      <span class="eyebrow">San Angelo, TX &middot; VIN Lookup & Recall Checker</span>
+      <span class="eyebrow">San Angelo, TX &middot; VIN Lookup</span>
     </div>
   </header>
 
@@ -348,7 +175,7 @@
     
     <div class="action-row">
       <button class="action-btn" id="scan" type="button" hidden>📷 Scan</button>
-      <button class="action-btn" id="decode" type="button" disabled>Decode & Check Recalls</button>
+      <button class="action-btn" id="decode" type="button" disabled>Decode VIN</button>
     </div>
     <p class="hint" id="vin-hint" role="status">Type or paste the VIN off the door jamb, dash, or title.</p>
 
@@ -371,14 +198,6 @@
     </div>
 
     <dl class="specs" id="specs"></dl>
-
-    <div class="recalls-card">
-      <div class="recalls-header">
-        <h3 class="recalls-title">Safety Recalls</h3>
-        <span class="badge" id="recall-badge">Checking...</span>
-      </div>
-      <div id="recalls-list"></div>
-    </div>
 
     <div class="meta-card">
       <div class="meta-row">
@@ -406,7 +225,7 @@
     <p class="summary" id="summary"></p>
   </section>
 
-  <footer>Vehicle & Recall data provided via NHTSA vPIC API</footer>
+  <footer>Vehicle data provided via NHTSA vPIC API</footer>
 </main>
 
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
@@ -426,8 +245,6 @@
   const digits   = Array.from(odo.querySelectorAll('.digit'));
   const summary  = document.getElementById('summary');
   const toast    = document.getElementById('toast');
-  const recallBadge = document.getElementById('recall-badge');
-  const recallsList = document.getElementById('recalls-list');
 
   let current = null;
 
@@ -499,58 +316,11 @@
     ['GVWR','GVWR']
   ];
 
-  async function fetchRecallsByYMM(year, make, model){
-    recallBadge.textContent = 'Checking...';
-    recallBadge.className = 'badge';
-    recallsList.innerHTML = '';
-
-    if (!year || !make || !model) {
-      recallBadge.textContent = 'Lookup Unavailable';
-      recallBadge.className = 'badge';
-      recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">Insufficient vehicle details to load recalls.</p>';
-      return;
-    }
-    
-    try {
-      const url = `https://vpic.nhtsa.dot.gov/api/vehicles/getrecallsformodelyear?make=${encodeURIComponent(make)}&modelyear=${encodeURIComponent(year)}&model=${encodeURIComponent(model)}&format=json`;
-      
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Recall API HTTP Error');
-      const data = await res.json();
-      const list = data.results || data.Results || [];
-
-      if(list.length === 0){
-        recallBadge.textContent = '0 Recalls Found';
-        recallBadge.className = 'badge none';
-        recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">No safety recalls reported for this model year combination in NHTSA database.</p>';
-      } else {
-        recallBadge.textContent = list.length + ' Recall(s) Found';
-        recallBadge.className = 'badge found';
-        list.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'recall-item';
-          card.innerHTML = `
-            <div class="recall-name">${item.Component || item.component || 'Safety Recall'}</div>
-            <div class="recall-detail"><strong>Summary:</strong> ${item.Summary || item.summary || 'N/A'}</div>
-            <div class="recall-detail"><strong>Consequence:</strong> ${item.Conequence || item.consequence || 'N/A'}</div>
-            <div class="recall-detail"><strong>Remedy:</strong> ${item.Remedy || item.remedy || 'N/A'}</div>
-            <div class="recall-meta">NHTSA Campaign #${item.NHTSACampaignNumber || item.nhtsaCampaignNumber || 'Unknown'}</div>
-          `;
-          recallsList.appendChild(card);
-        });
-      }
-    } catch(err) {
-      recallBadge.textContent = 'Lookup Unavailable';
-      recallBadge.className = 'badge';
-      recallsList.innerHTML = '<p class="recall-detail" style="color:#ef4444;">Unable to retrieve recall information.</p>';
-    }
-  }
-
   async function run(){
     const v = vin.value;
     decodeBtn.disabled = true;
     decodeBtn.textContent = 'Reading...';
-    hint.textContent = 'Checking vehicle specs and recall data...';
+    hint.textContent = 'Checking vehicle specs...';
     hint.className = 'hint';
     try{
       const res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + v + '?format=json');
@@ -559,7 +329,6 @@
       const r = data.Results && data.Results[0];
       if(!r || (!r.Make && !r.ModelYear)) throw new Error('empty');
       render(v, r);
-      fetchRecallsByYMM(r.ModelYear, r.Make, r.Model);
       hint.textContent = '';
     }catch(err){
       results.classList.remove('shown');
@@ -568,7 +337,7 @@
         : 'Could not connect to database. Check internet connection.';
       hint.className = 'hint warn';
     }finally{
-      decodeBtn.textContent = 'Decode & Check Recalls';
+      decodeBtn.textContent = 'Decode VIN';
       decodeBtn.disabled = vin.value.length !== 17;
     }
   }
@@ -656,7 +425,6 @@
     vin.value = ''; miles.value = ''; trimIn.value = ''; current = null;
     results.classList.remove('shown');
     specs.innerHTML = ''; summary.textContent = '';
-    recallsList.innerHTML = '';
     syncVin(); syncOdo(); vin.focus();
   });
 
@@ -664,7 +432,6 @@
   const stopBtn  = document.getElementById('stopscan');
   const scanner  = document.getElementById('scanner');
   const video    = document.getElementById('video');
-  const scanNote = document.getElementById('scan-note');
   const VIN_RE   = /[A-HJ-NPR-Z0-9]{17}/;
   let reader = null;
 
