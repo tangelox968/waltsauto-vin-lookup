@@ -303,15 +303,6 @@
     min-height:0;
   }
   .viewport video{width:100%;height:100%;object-fit:cover;display:block}
-  .aim{
-    position:absolute;
-    left:8%;
-    right:8%;
-    top:50%;
-    height:2px;
-    background:var(--accent);
-    box-shadow:0 0 12px 1px rgba(34,211,238,.8);
-  }
   .scan-bar{
     display:flex;
     align-items:center;
@@ -579,7 +570,6 @@
     <div class="scanner" id="scanner">
       <div class="viewport">
         <video id="video" playsinline autoplay muted></video>
-        <div class="aim" aria-hidden="true"></div>
       </div>
       <canvas id="shot" hidden></canvas>
       <div class="scan-bar">
@@ -1058,6 +1048,11 @@
 
   const scanCanvas = document.createElement('canvas');
   let scanTimer = null;
+  // Higher resolution helps a lot with small/rotated barcode detail; browsers
+  // fall back to their max supported size if the device camera can't do this.
+  const CAMERA_CONSTRAINTS = {
+    video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }
+  };
 
   function rotateCanvas(src, degrees){
     const c = document.createElement('canvas');
@@ -1107,14 +1102,14 @@
 
   // Vertically-printed door-jamb barcodes never line up with a horizontal
   // scan line no matter how the phone is held, so instead of relying on the
-  // user to rotate the camera, each frame is also tried rotated 90/270.
+  // user to rotate the camera, each frame is also tried at every quarter-turn.
   function scanLoop(){
     if(!mediaStream || !reader) return;
     if(video.videoWidth){
       scanCanvas.width = video.videoWidth;
       scanCanvas.height = video.videoHeight;
       scanCanvas.getContext('2d').drawImage(video, 0, 0);
-      for(const angle of [0, 90, 270]){
+      for(const angle of [0, 90, 180, 270]){
         try{
           const cvs = angle === 0 ? scanCanvas : rotateCanvas(scanCanvas, angle);
           const result = decodeCanvas(cvs, reader);
@@ -1147,7 +1142,7 @@
     hint.className = 'hint';
 
     try{
-      mediaStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } } });
+      mediaStream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
       video.srcObject = mediaStream;
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
       scanLoop();
@@ -1171,7 +1166,7 @@
     hint.textContent = '';
     hint.className = 'hint';
     try{
-      mediaStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } } });
+      mediaStream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
       video.srcObject = mediaStream;
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
     }catch(err){
