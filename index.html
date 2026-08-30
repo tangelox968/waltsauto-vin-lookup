@@ -22,8 +22,6 @@
     --accent-glow-bg: rgba(16, 185, 129, 0.15);
     --accent-red: #ef4444;
     --accent-red-bg: rgba(239, 68, 68, 0.15);
-    --accent-amber: #f59e0b;
-    --accent-amber-bg: rgba(245, 158, 11, 0.15);
     --btn-bg: #1e293b;
     --btn-hover: #334155;
     --pad: clamp(16px, 4vw, 32px);
@@ -501,24 +499,30 @@
     ['GVWR','GVWR']
   ];
 
-  async function fetchRecalls(v){
+  async function fetchRecallsByYMM(year, make, model){
     recallBadge.textContent = 'Checking...';
     recallBadge.className = 'badge';
     recallsList.innerHTML = '';
+
+    if (!year || !make || !model) {
+      recallBadge.textContent = 'Lookup Unavailable';
+      recallBadge.className = 'badge';
+      recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">Insufficient vehicle details to load recalls.</p>';
+      return;
+    }
     
     try {
-      const targetApi = `https://api.nhtsa.gov/recalls/recallsByVin?vin=${v}&format=json`;
-      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetApi)}`;
+      const url = `https://vpic.nhtsa.dot.gov/api/vehicles/getrecallsformodelyear?make=${encodeURIComponent(make)}&modelyear=${encodeURIComponent(year)}&model=${encodeURIComponent(model)}&format=json`;
       
-      const res = await fetch(proxyUrl);
-      if(!res.ok) throw new Error('Recall API error');
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Recall API HTTP Error');
       const data = await res.json();
-      const list = data.results || [];
+      const list = data.results || data.Results || [];
 
       if(list.length === 0){
-        recallBadge.textContent = '0 Open Recalls';
+        recallBadge.textContent = '0 Recalls Found';
         recallBadge.className = 'badge none';
-        recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">No unrepaired safety recalls found for this VIN via NHTSA database.</p>';
+        recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">No safety recalls reported for this model year combination in NHTSA database.</p>';
       } else {
         recallBadge.textContent = list.length + ' Recall(s) Found';
         recallBadge.className = 'badge found';
@@ -526,11 +530,11 @@
           const card = document.createElement('div');
           card.className = 'recall-item';
           card.innerHTML = `
-            <div class="recall-name">${item.Component || 'Safety Recall'}</div>
-            <div class="recall-detail"><strong>Summary:</strong> ${item.Summary || 'N/A'}</div>
-            <div class="recall-detail"><strong>Consequence:</strong> ${item.Conequence || item.Consequence || 'N/A'}</div>
-            <div class="recall-detail"><strong>Remedy:</strong> ${item.Remedy || 'N/A'}</div>
-            <div class="recall-meta">NHTSA Campaign #${item.NHTSACampaignNumber || 'Unknown'} &middot; Date: ${item.ReportReceivedDate || 'N/A'}</div>
+            <div class="recall-name">${item.Component || item.component || 'Safety Recall'}</div>
+            <div class="recall-detail"><strong>Summary:</strong> ${item.Summary || item.summary || 'N/A'}</div>
+            <div class="recall-detail"><strong>Consequence:</strong> ${item.Conequence || item.consequence || 'N/A'}</div>
+            <div class="recall-detail"><strong>Remedy:</strong> ${item.Remedy || item.remedy || 'N/A'}</div>
+            <div class="recall-meta">NHTSA Campaign #${item.NHTSACampaignNumber || item.nhtsaCampaignNumber || 'Unknown'}</div>
           `;
           recallsList.appendChild(card);
         });
@@ -538,7 +542,7 @@
     } catch(err) {
       recallBadge.textContent = 'Lookup Unavailable';
       recallBadge.className = 'badge';
-      recallsList.innerHTML = '<p class="recall-detail" style="color:#ef4444;">Unable to load recall status. Check connection.</p>';
+      recallsList.innerHTML = '<p class="recall-detail" style="color:#ef4444;">Unable to retrieve recall information.</p>';
     }
   }
 
@@ -555,7 +559,7 @@
       const r = data.Results && data.Results[0];
       if(!r || (!r.Make && !r.ModelYear)) throw new Error('empty');
       render(v, r);
-      fetchRecalls(v);
+      fetchRecallsByYMM(r.ModelYear, r.Make, r.Model);
       hint.textContent = '';
     }catch(err){
       results.classList.remove('shown');
