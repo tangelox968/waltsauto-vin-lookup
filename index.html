@@ -38,7 +38,7 @@
     padding: max(var(--pad), env(safe-area-inset-top)) var(--pad) calc(40px + env(safe-area-inset-bottom));
   }
 
-  /* ---------- Header Bar ---------- */
+  /* Header Bar */
   .masthead {
     display: flex;
     align-items: center;
@@ -66,7 +66,7 @@
     margin-top: 2px;
   }
 
-  /* ---------- VIN Input Card ---------- */
+  /* VIN Input Card */
   .entry {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -141,7 +141,7 @@
   .hint.warn { color: var(--accent-red); }
   .hint.ok { color: var(--accent-glow); }
 
-  /* ---------- Results Display ---------- */
+  /* Results Display */
   .results { margin-top: 24px; display: none; }
   .results.shown { display: block; }
   .results-head {
@@ -194,7 +194,7 @@
   }
   .spec dd { margin: 0; font-size: 15px; font-weight: 600; color: #ffffff; word-break: break-word; }
 
-  /* ---------- Recalls Section ---------- */
+  /* Recalls Section */
   .recalls-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -251,7 +251,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* ---------- Odometer & Field Log ---------- */
+  /* Odometer & Fields */
   .meta-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -300,7 +300,6 @@
   .digit.tenth { background: #331010; color: var(--accent-red); }
   #miles { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: text; }
 
-  /* ---------- Actions & Summary ---------- */
   .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .ghost {
     background: var(--btn-bg);
@@ -509,20 +508,29 @@
     ['GVWR','GVWR']
   ];
 
-  async function fetchRecalls(v){
+  async function fetchRecallsByMakeModel(year, make, model){
     recallBadge.textContent = 'Checking...';
     recallBadge.className = 'badge';
     recallsList.innerHTML = '';
+    
+    if(!year || !make || !model) {
+      recallBadge.textContent = 'N/A';
+      recallBadge.className = 'badge';
+      recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">Insufficient vehicle details to check recalls.</p>';
+      return;
+    }
+
     try {
-      const res = await fetch('https://api.nhtsa.gov/recalls/recallsByVin?vin=' + v + '&format=json');
+      const url = `https://vpic.nhtsa.dot.gov/api/vehicles/getrecallsformakemodel?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelyear=${encodeURIComponent(year)}&format=json`;
+      const res = await fetch(url);
       if(!res.ok) throw new Error('Recall API error');
       const data = await res.json();
-      const list = data.results || [];
+      const list = data.Results || [];
 
       if(list.length === 0){
         recallBadge.textContent = '0 Open Recalls';
         recallBadge.className = 'badge none';
-        recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">No unrepaired safety recalls found for this VIN via NHTSA database.</p>';
+        recallsList.innerHTML = '<p class="recall-detail" style="color:#94a3b8;">No safety recalls found for this vehicle model via NHTSA database.</p>';
       } else {
         recallBadge.textContent = list.length + ' Recall(s) Found';
         recallBadge.className = 'badge found';
@@ -559,7 +567,7 @@
       const r = data.Results && data.Results[0];
       if(!r || (!r.Make && !r.ModelYear)) throw new Error('empty');
       render(v, r);
-      fetchRecalls(v);
+      fetchRecallsByMakeModel(r.ModelYear, r.Make, r.Model);
       hint.textContent = '';
     }catch(err){
       results.classList.remove('shown');
