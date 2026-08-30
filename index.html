@@ -4,401 +4,179 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VIN Lookup">
-<meta name="theme-color" content="#E3DCC9">
+<meta name="theme-color" content="#2b2623">
 <title>VIN Lookup &mdash; Walt's Auto Sales</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --ink:#1A1916;
-    --ink-soft:#5A5344;
-    --paper:#E3DCC9;
-    --panel:#F1ECDF;
-    --rule:#B7AE97;
-    --stamp:#A8331F;
-    --plate:#1F4D6B;
-    --drum:#14130F;
-    --drum-face:#F3EFE6;
-    --pad:clamp(18px,4vw,40px);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Public Sans',system-ui,sans-serif;
-    font-size:16px;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
-  .sheet{
-    max-width:960px;
-    margin:0 auto;
-    padding:max(var(--pad),env(safe-area-inset-top)) var(--pad)
-            calc(64px + env(safe-area-inset-bottom));
+  :root {
+    --bg-dark: #2b2623;
+    --card-bg: #3d3531;
+    --card-border: #524742;
+    --text-primary: #f5efe6;
+    --text-secondary: #c2b69d;
+    --accent-glow: #d97706;
+    --accent-glow-bg: rgba(217, 119, 6, 0.15);
+    --accent-red: #dc2626;
+    --btn-bg: #4a403a;
+    --btn-hover: #5a4e47;
+    --pad: clamp(16px, 4vw, 32px);
   }
 
-  /* ---------- masthead ---------- */
-  .masthead{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:16px;
-    flex-wrap:wrap;
-    border-bottom:2px solid var(--ink);
-    padding-bottom:10px;
-  }
-  .lockup{
-    font-family:'Saira Condensed',sans-serif;
-    font-weight:700;
-    font-size:clamp(26px,5vw,40px);
-    letter-spacing:.04em;
-    text-transform:uppercase;
-    line-height:1;
-    margin:0;
-  }
-  .lockup span{color:var(--stamp)}
-  .eyebrow{
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background-color: var(--bg-dark); color: var(--text-primary); font-family: system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .sheet {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: max(var(--pad), env(safe-area-inset-top)) var(--pad) calc(40px + env(safe-area-inset-bottom));
   }
 
-  /* ---------- vin entry ---------- */
-  .entry{padding:32px 0 8px}
-  label.field-label{
-    display:block;
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-bottom:8px;
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
   }
-  .vin-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
-  .vin-wrap{position:relative;flex:1 1 420px;min-width:0}
-  #vin{
-    width:100%;
-    background:var(--panel);
-    border:1px solid var(--rule);
-    border-bottom:2px solid var(--ink);
-    border-radius:2px;
-    padding:16px 76px 16px 16px;
-    font-family:'JetBrains Mono',monospace;
-    font-weight:500;
-    font-size:clamp(19px,3.6vw,27px);
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--ink);
+  .lockup-wrap { display: flex; flex-direction: column; }
+  .lockup {
+    font-weight: 800;
+    font-size: clamp(20px, 4vw, 24px);
+    margin: 0;
+    color: #ffffff;
   }
-  #vin::placeholder{color:#B3AB96;letter-spacing:.16em}
-  #vin:focus{outline:3px solid var(--plate);outline-offset:2px}
-  .count{
-    position:absolute;
-    right:14px;
-    top:50%;
-    transform:translateY(-50%);
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;
-    color:var(--ink-soft);
-    pointer-events:none;
-  }
-  .count.full{color:var(--plate);font-weight:700}
-  button{
-    font-family:'Saira Condensed',sans-serif;
-    font-weight:700;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    font-size:17px;
-    cursor:pointer;
-    border-radius:2px;
-    transition:background .12s ease,color .12s ease;
-  }
-  button:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
-  #decode{
-    flex:0 0 auto;
-    padding:0 28px;
-    background:var(--ink);
-    color:var(--panel);
-    border:1px solid var(--ink);
-  }
-  #decode:hover{background:var(--stamp);border-color:var(--stamp)}
-  #decode:disabled{background:#9C9583;border-color:#9C9583;cursor:not-allowed}
-  .hint{
-    margin:10px 0 0;
-    font-size:13.5px;
-    color:var(--ink-soft);
-    min-height:20px;
-  }
-  .hint.warn{color:var(--stamp)}
-  .hint.ok{color:var(--plate)}
+  .eyebrow { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-  /* ---------- results ---------- */
-  .results{margin-top:36px;display:none}
-  .results.shown{display:block}
-  .results-head{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:14px;
-    flex-wrap:wrap;
-    border-bottom:1px solid var(--rule);
-    padding-bottom:6px;
-    margin-bottom:0;
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
   }
-  .headline{
-    font-family:'Saira Condensed',sans-serif;
-    font-weight:700;
-    font-size:clamp(28px,6vw,46px);
-    line-height:1.05;
-    text-transform:uppercase;
-    letter-spacing:.02em;
-    margin:0;
+  label.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
   }
-  .stamp{
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    color:var(--stamp);
-    border:1.5px solid var(--stamp);
-    padding:4px 8px;
-    border-radius:2px;
-    white-space:nowrap;
+  .vin-wrap { position: relative; width: 100%; margin-bottom: 14px; }
+  #vin {
+    width: 100%;
+    background: #1c1816;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 16px 80px 16px 16px;
+    font-family: monospace;
+    font-weight: 600;
+    font-size: clamp(16px, 3.5vw, 22px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff;
   }
-  dl.specs{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-    gap:0 32px;
-    margin:0;
+  #vin::placeholder { color: #85756e; letter-spacing: 0.1em; }
+  #vin:focus { outline: none; border-color: var(--accent-glow); }
+  
+  .count {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    font-family: monospace; font-size: 13px; color: var(--text-secondary);
   }
-  .spec{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:12px;
-    border-bottom:1px solid var(--rule);
-    padding:11px 0;
-  }
-  .spec dt{
-    font-family:'JetBrains Mono',monospace;
-    font-size:10.5px;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    white-space:nowrap;
-  }
-  .spec dd{
-    margin:0;
-    font-weight:600;
-    text-align:right;
-  }
+  .count.full { color: var(--accent-glow); font-weight: 700; }
 
-  /* ---------- odometer ---------- */
-  #scan{
-    flex:0 0 auto;
-    padding:0 22px;
-    background:transparent;
-    color:var(--ink);
-    border:1.5px solid var(--ink);
+  .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  button.action-btn {
+    flex: 1; min-width: 100px; padding: 12px 16px;
+    background: var(--btn-bg); color: #ffffff; border: 1px solid var(--card-border);
+    border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  #scan:hover{background:var(--ink);color:var(--panel)}
-  #scan[hidden]{display:none}
-  .scanner{
-    display:none;
-    margin-top:16px;
-    background:var(--drum);
-    border-radius:3px;
-    padding:10px;
-  }
-  .scanner.open{display:block}
-  .viewport{
-    position:relative;
-    width:100%;
-    max-width:520px;
-    aspect-ratio:4/3;
-    background:#000;
-    border-radius:2px;
-    overflow:hidden;
-  }
-  .viewport video{width:100%;height:100%;object-fit:cover;display:block}
-  .aim{
-    position:absolute;
-    left:8%;
-    right:8%;
-    top:50%;
-    height:2px;
-    background:var(--stamp);
-    box-shadow:0 0 0 1px rgba(0,0,0,.4);
-  }
-  .scan-bar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-top:10px;
-  }
-  .scan-note{
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:#B9B3A3;
-  }
-  #stopscan{
-    background:transparent;
-    color:var(--drum-face);
-    border:1.5px solid #55514A;
-    padding:8px 18px;
-  }
-  #stopscan:hover{background:var(--drum-face);color:var(--drum)}
-  .meta-row{
-    display:flex;
-    gap:clamp(24px,5vw,56px);
-    flex-wrap:wrap;
-    align-items:flex-start;
-    margin-top:44px;
-  }
-  .odo-block{flex:0 0 auto}
-  .trim-block{flex:1 1 260px;min-width:0}
-  .text-field{
-    width:100%;
-    background:var(--panel);
-    border:1px solid var(--rule);
-    border-bottom:2px solid var(--ink);
-    border-radius:2px;
-    padding:14px 14px;
-    font-family:'Public Sans',sans-serif;
-    font-size:17px;
-    font-weight:600;
-    color:var(--ink);
-  }
-  .text-field::placeholder{font-weight:400;color:#A9A18C}
-  .text-field:focus{outline:3px solid var(--plate);outline-offset:2px}
-  .sub{
-    margin:8px 0 0;
-    font-size:13px;
-    color:var(--ink-soft);
-  }
-  .odo{
-    position:relative;
-    display:inline-flex;
-    gap:3px;
-    padding:10px;
-    background:var(--drum);
-    border-radius:3px;
-    cursor:text;
-  }
-  .odo:focus-within{outline:3px solid var(--plate);outline-offset:3px}
-  .digit{
-    width:clamp(32px,8vw,44px);
-    padding:8px 0;
-    text-align:center;
-    background:var(--drum-face);
-    color:var(--drum);
-    font-family:'JetBrains Mono',monospace;
-    font-weight:700;
-    font-size:clamp(24px,6vw,34px);
-    line-height:1;
-    border-radius:1px;
-  }
-  .digit.lead{color:#9F9A8E}
-  .digit.tenth{background:var(--drum-face);color:var(--stamp)}
-  #miles{
-    position:absolute;
-    inset:0;
-    width:100%;
-    opacity:0;
-    border:0;
-    font-size:16px;
-    cursor:text;
-  }
-  .odo-unit{
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-left:12px;
-  }
+  button.action-btn:hover:not(:disabled) { background: var(--btn-hover); }
+  button.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #decode { background: #b45309; border-color: #d97706; }
+  #decode:hover:not(:disabled) { background: #92400e; }
 
-  /* ---------- summary ---------- */
-  .actions{margin-top:36px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .ghost{
-    background:transparent;
-    color:var(--ink);
-    border:1.5px solid var(--ink);
-    padding:11px 22px;
-  }
-  .ghost:hover{background:var(--ink);color:var(--panel)}
-  .summary{
-    margin-top:18px;
-    background:var(--panel);
-    border-left:3px solid var(--stamp);
-    padding:14px 16px;
-    font-family:'JetBrains Mono',monospace;
-    font-size:13.5px;
-    line-height:1.7;
-    word-break:break-word;
-  }
-  .toast{
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--plate);
-    opacity:0;
-    transition:opacity .2s ease;
-  }
-  .toast.on{opacity:1}
+  .hint { margin: 12px 0 0; font-size: 13px; color: var(--text-secondary); }
+  .hint.warn { color: var(--accent-red); }
+  .hint.ok { color: var(--accent-glow); }
 
-  footer{
-    margin-top:56px;
-    padding-top:14px;
-    border-top:1px solid var(--rule);
-    font-family:'JetBrains Mono',monospace;
-    font-size:10.5px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-  }
+  .results { margin-top: 24px; display: none; }
+  .results.shown { display: block; }
+  .results-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+  .headline { font-weight: 700; font-size: clamp(22px, 5vw, 32px); margin: 0; color: #ffffff; }
+  .stamp { background: var(--accent-glow-bg); color: var(--accent-glow); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-glow); }
 
-  @media (prefers-reduced-motion:reduce){
-    *{transition:none!important}
-  }
-  @media print{
-    body{background:#fff}
-    #decode,.actions,.hint,footer{display:none}
-    .odo{background:#fff;border:1px solid #000}
-    .digit{background:#fff}
-  }
+  dl.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0 0 24px 0; }
+  .spec { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .spec dt { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 6px; }
+  .spec dd { margin: 0; font-size: 15px; font-weight: 600; color: #ffffff; word-break: break-word; }
+
+  .recalls-block { margin-top: 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; }
+  .recalls-head { font-weight: 700; font-size: 16px; margin: 0 0 12px 0; color: #ffffff; }
+  .recall-item { background: #1c1816; border: 1px solid var(--card-border); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+  .recall-item:last-child { margin-bottom: 0; }
+  .recall-campaign { font-size: 12px; font-weight: 700; color: var(--accent-glow); margin-bottom: 4px; }
+  .recall-desc { font-size: 13px; color: var(--text-primary); margin: 0 0 6px 0; }
+  .recall-action { font-size: 12px; color: var(--text-secondary); margin: 0; }
+
+  .meta-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 20px; margin-top: 16px; }
+  .meta-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .odo-block, .trim-block { flex: 1; min-width: 200px; }
+  
+  .text-field { width: 100%; background: #1c1816; border: 1px solid var(--card-border); border-radius: 6px; padding: 12px; font-size: 15px; color: #ffffff; }
+  .text-field:focus { outline: none; border-color: var(--accent-glow); }
+
+  .odo { display: inline-flex; gap: 4px; padding: 8px; background: #1c1816; border-radius: 6px; border: 1px solid var(--card-border); position: relative; }
+  .digit { width: 28px; height: 36px; display: flex; align-items: center; justify-content: center; background: #2b2623; color: #ffffff; font-family: monospace; font-weight: 700; font-size: 20px; border-radius: 4px; }
+  .digit.lead { color: #665a54; }
+  .digit.tenth { background: #451a1a; color: var(--accent-red); }
+  #miles { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: text; }
+
+  .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .ghost { background: var(--btn-bg); color: #ffffff; border: 1px solid var(--card-border); padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+  .ghost:hover { background: var(--btn-hover); }
+  .summary { margin-top: 16px; background: #1c1816; border-left: 4px solid var(--accent-glow); border-radius: 0 6px 6px 0; padding: 14px; font-family: monospace; font-size: 13px; color: #cbd5e1; word-break: break-word; }
+  .toast { font-size: 13px; color: var(--accent-glow); opacity: 0; transition: opacity 0.2s; }
+  .toast.on { opacity: 1; }
+
+  .scanner { display: none; margin-top: 16px; background: #000; border-radius: 8px; padding: 12px; }
+  .scanner.open { display: block; }
+  .viewport { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 6px; overflow: hidden; }
+  .viewport video { width: 100%; height: 100%; object-fit: cover; }
+  .aim { position: absolute; left: 10%; right: 10%; top: 50%; height: 2px; background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+
+  footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--text-secondary); }
 </style>
 </head>
 <body>
 <main class="sheet">
 
   <header class="masthead">
-    <h1 class="lockup">Walt's Auto <span>&mdash;</span> VIN Lookup</h1>
-    <p class="eyebrow">San Angelo, TX</p>
+    <div class="lockup-wrap">
+      <h1 class="lockup">Walt's Auto</h1>
+      <span class="eyebrow">San Angelo, TX &middot; VIN Lookup & Recall Checker</span>
+    </div>
   </header>
 
   <section class="entry">
-    <label class="field-label" for="vin">Vehicle identification number</label>
-    <div class="vin-row">
-      <div class="vin-wrap">
-        <input id="vin" type="text" spellcheck="false" autocomplete="off"
+    <label class="field-label" for="vin">Vehicle Identification Number</label>
+    <div class="vin-wrap">
+      <input id="vin" type="text" spellcheck="false" autocomplete="off"
              autocorrect="off" autocapitalize="characters"
              maxlength="17" placeholder="1FTEW1EP7JF..." aria-describedby="vin-hint">
-        <span class="count" id="count" aria-hidden="true">0 / 17</span>
-      </div>
-      <button id="scan" type="button" hidden>Scan</button>
-      <button id="decode" type="button" disabled>Decode</button>
+      <span class="count" id="count" aria-hidden="true">0 / 17</span>
+    </div>
+    
+    <div class="action-row">
+      <button class="action-btn" id="scan" type="button" hidden>📷 Scan</button>
+      <button class="action-btn" id="decode" type="button" disabled>Decode & Check Recalls</button>
     </div>
     <p class="hint" id="vin-hint" role="status">Type or paste the VIN off the door jamb, dash, or title.</p>
 
@@ -407,9 +185,9 @@
         <video id="video" playsinline autoplay muted></video>
         <div class="aim" aria-hidden="true"></div>
       </div>
-      <div class="scan-bar">
-        <span class="scan-note" id="scan-note">Hold the barcode across the red line</span>
-        <button id="stopscan" type="button">Cancel</button>
+      <div class="actions" style="justify-content:space-between;">
+        <span style="font-size:12px; color:#c2b69d;" id="scan-note">Center barcode along red line</span>
+        <button class="ghost" id="stopscan" type="button">Cancel</button>
       </div>
     </div>
   </section>
@@ -417,61 +195,66 @@
   <section class="results" id="results" aria-live="polite">
     <div class="results-head">
       <h2 class="headline" id="headline">&nbsp;</h2>
-      <span class="stamp" id="checkstamp" hidden>Check digit OK</span>
+      <span class="stamp" id="checkstamp" hidden>Check Digit OK</span>
     </div>
+
     <dl class="specs" id="specs"></dl>
 
-    <div class="meta-row">
-      <div class="odo-block">
-        <label class="field-label" for="miles">Odometer reading</label>
-        <div class="odo" id="odo">
-          <span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit tenth">0</span>
-          <input id="miles" type="text" inputmode="numeric" autocomplete="off" maxlength="6" aria-label="Odometer reading in miles">
-        </div>
-        <span class="odo-unit">Miles</span>
-      </div>
+    <div class="recalls-block" id="recalls-container">
+      <h3 class="recalls-head">Safety Recalls</h3>
+      <div id="recalls-list"></div>
+    </div>
 
-      <div class="trim-block">
-        <label class="field-label" for="trim">Trim or package &mdash; optional</label>
-        <input id="trim" class="text-field" type="text" autocomplete="off" maxlength="60"
-               placeholder="XLT, Z71, Sport, Limited…" aria-describedby="trim-sub">
-        <p class="sub" id="trim-sub">Fills in from the VIN when NHTSA has it. Type over it to correct or add a package.</p>
+    <div class="meta-card">
+      <div class="meta-row">
+        <div class="odo-block">
+          <label class="field-label" for="miles">Odometer Reading</label>
+          <div class="odo" id="odo">
+            <span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit tenth">0</span>
+            <input id="miles" type="text" inputmode="numeric" autocomplete="off" maxlength="6" aria-label="Odometer reading in miles">
+          </div>
+        </div>
+
+        <div class="trim-block">
+          <label class="field-label" for="trim">Trim / Package (Optional)</label>
+          <input id="trim" class="text-field" type="text" autocomplete="off" maxlength="60" placeholder="XLT, Z71, Sport...">
+        </div>
       </div>
     </div>
 
     <div class="actions">
-      <button class="ghost" id="copy" type="button">Copy summary</button>
+      <button class="ghost" id="copy" type="button">Copy Summary</button>
       <button class="ghost" id="print" type="button">Print</button>
       <button class="ghost" id="reset" type="button">Clear</button>
-      <span class="toast" id="toast">Copied</span>
+      <span class="toast" id="toast">Copied to clipboard</span>
     </div>
     <p class="summary" id="summary"></p>
   </section>
 
-  <footer>Vehicle data from the NHTSA vPIC database &middot; decoded specs are factory build data, not condition</footer>
+  <footer>Vehicle data provided via NHTSA vPIC API</footer>
 </main>
 
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script>
 (function(){
-  const vin      = document.getElementById('vin');
-  const count    = document.getElementById('count');
-  const decodeBtn= document.getElementById('decode');
-  const hint     = document.getElementById('vin-hint');
-  const results  = document.getElementById('results');
-  const headline = document.getElementById('headline');
-  const stamp    = document.getElementById('checkstamp');
-  const specs    = document.getElementById('specs');
-  const miles    = document.getElementById('miles');
-  const odo      = document.getElementById('odo');
-  const trimIn   = document.getElementById('trim');
-  const digits   = Array.from(odo.querySelectorAll('.digit'));
-  const summary  = document.getElementById('summary');
-  const toast    = document.getElementById('toast');
+  const vin          = document.getElementById('vin');
+  const count        = document.getElementById('count');
+  const decodeBtn    = document.getElementById('decode');
+  const hint         = document.getElementById('vin-hint');
+  const results      = document.getElementById('results');
+  const headline     = document.getElementById('headline');
+  const stamp        = document.getElementById('checkstamp');
+  const specs        = document.getElementById('specs');
+  const miles        = document.getElementById('miles');
+  const odo          = document.getElementById('odo');
+  const trimIn       = document.getElementById('trim');
+  const digits       = Array.from(odo.querySelectorAll('.digit'));
+  const summary      = document.getElementById('summary');
+  const toast        = document.getElementById('toast');
+  const recallsList  = document.getElementById('recalls-list');
 
   let current = null;
 
-  /* --- VIN check digit (ISO 3779) --- */
   const VALS = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9};
   const WEIGHTS = [8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
   function checkDigitValid(v){
@@ -488,7 +271,6 @@
     return expect === actual;
   }
 
-  /* --- VIN input --- */
   function cleanVin(s){
     return s.toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[IOQ]/g,'').slice(0,17);
   }
@@ -498,10 +280,10 @@
     count.classList.toggle('full', v.length === 17);
     decodeBtn.disabled = v.length !== 17;
     if(v.length === 17 && !checkDigitValid(v)){
-      hint.textContent = 'That VIN fails its check digit — worth a second look before you decode it.';
+      hint.textContent = 'That VIN fails its check digit — double-check your typing.';
       hint.className = 'hint warn';
     } else if(v.length === 17){
-      hint.textContent = 'Looks good. Press Decode.';
+      hint.textContent = 'Check digit valid. Press Decode.';
       hint.className = 'hint ok';
     } else {
       hint.textContent = 'Type or paste the VIN off the door jamb, dash, or title.';
@@ -511,7 +293,6 @@
   vin.addEventListener('input', () => { vin.value = cleanVin(vin.value); syncVin(); });
   vin.addEventListener('keydown', e => { if(e.key === 'Enter' && !decodeBtn.disabled) run(); });
 
-  /* --- odometer --- */
   function syncOdo(){
     const raw = miles.value.replace(/\D/g,'').slice(0,6);
     miles.value = raw;
@@ -528,7 +309,6 @@
   odo.addEventListener('click', () => miles.focus());
   trimIn.addEventListener('input', writeSummary);
 
-  /* --- decode --- */
   const FIELDS = [
     ['Trim','Trim'],
     ['Body','BodyClass'],
@@ -543,11 +323,38 @@
     ['GVWR','GVWR']
   ];
 
+  async function fetchRecalls(v){
+    recallsList.innerHTML = '<div style="font-size:13px; color:var(--text-secondary);">Loading recall data...</div>';
+    try {
+      const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.nhtsa.gov/recalls/recallsByVin?vin=' + v + '&format=json'));
+      if(!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+      
+      recallsList.innerHTML = '';
+      if(data.results && data.results.length > 0){
+        data.results.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'recall-item';
+          div.innerHTML = `
+            <div class="recall-campaign">Campaign #${item.NHTSACampaignNumber || 'N/A'}</div>
+            <p class="recall-desc"><strong>Summary:</strong> ${item.Summary || 'No summary provided.'}</p>
+            <p class="recall-action"><strong>Remedy:</strong> ${item.Conequence || item.Remedy || 'Contact dealer for details.'}</p>
+          `;
+          recallsList.appendChild(div);
+        });
+      } else {
+        recallsList.innerHTML = '<div style="font-size:13px; color:var(--text-secondary);">No unrepaired safety recalls found for this VIN.</div>';
+      }
+    } catch(err) {
+      recallsList.innerHTML = '<div style="font-size:13px; color:var(--text-secondary);">Unable to fetch recall info at this time.</div>';
+    }
+  }
+
   async function run(){
     const v = vin.value;
     decodeBtn.disabled = true;
-    decodeBtn.textContent = 'Reading';
-    hint.textContent = 'Checking the VIN against the NHTSA database…';
+    decodeBtn.textContent = 'Reading...';
+    hint.textContent = 'Checking vehicle specs and recalls...';
     hint.className = 'hint';
     try{
       const res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + v + '?format=json');
@@ -556,15 +363,16 @@
       const r = data.Results && data.Results[0];
       if(!r || (!r.Make && !r.ModelYear)) throw new Error('empty');
       render(v, r);
+      fetchRecalls(v);
       hint.textContent = '';
     }catch(err){
       results.classList.remove('shown');
       hint.textContent = (err.message === 'empty')
-        ? 'NHTSA returned nothing for that VIN. Check the characters and try again.'
-        : 'Could not reach the NHTSA database. Check the connection and try again.';
+        ? 'NHTSA returned no data for that VIN.'
+        : 'Could not connect to database. Check internet connection.';
       hint.className = 'hint warn';
     }finally{
-      decodeBtn.textContent = 'Decode';
+      decodeBtn.textContent = 'Decode & Check Recalls';
       decodeBtn.disabled = vin.value.length !== 17;
     }
   }
@@ -618,7 +426,6 @@
     syncOdo();
   }
 
-  /* --- summary --- */
   function writeSummary(){
     if(!current){ summary.textContent = ''; return; }
     const m = miles.value.replace(/\D/g,'');
@@ -638,9 +445,9 @@
     if(!summary.textContent) return;
     try{
       await navigator.clipboard.writeText(summary.textContent);
-      toast.textContent = 'Copied';
+      toast.textContent = 'Copied to clipboard';
     }catch(e){
-      toast.textContent = 'Copy blocked — select it by hand';
+      toast.textContent = 'Copy failed';
     }
     toast.classList.add('on');
     setTimeout(() => toast.classList.remove('on'), 1600);
@@ -653,34 +460,24 @@
     vin.value = ''; miles.value = ''; trimIn.value = ''; current = null;
     results.classList.remove('shown');
     specs.innerHTML = ''; summary.textContent = '';
+    recallsList.innerHTML = '';
     syncVin(); syncOdo(); vin.focus();
   });
 
-  /* --- barcode scanner --- */
   const scanBtn  = document.getElementById('scan');
   const stopBtn  = document.getElementById('stopscan');
   const scanner  = document.getElementById('scanner');
   const video    = document.getElementById('video');
-  const scanNote = document.getElementById('scan-note');
   const VIN_RE   = /[A-HJ-NPR-Z0-9]{17}/;
   let reader = null;
 
-  const cameraReady = typeof ZXing !== 'undefined'
-    && navigator.mediaDevices
-    && typeof navigator.mediaDevices.getUserMedia === 'function';
-
-  const inAppBrowser = /FBAN|FBAV|Instagram|Line|MicroMessenger/i.test(navigator.userAgent);
-
+  const cameraReady = typeof ZXing !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function';
   if(cameraReady) scanBtn.hidden = false;
-  if(cameraReady && inAppBrowser){
-    hint.textContent = 'Scanning needs Safari — tap the ••• menu and choose Open in Safari.';
-    hint.className = 'hint warn';
-  }
 
   function stopScan(){
     if(reader){ reader.reset(); reader = null; }
     scanner.classList.remove('open');
-    scanBtn.textContent = 'Scan';
+    scanBtn.textContent = '📷 Scan';
   }
 
   async function startScan(){
@@ -696,10 +493,6 @@
     reader = new ZXing.BrowserMultiFormatReader(hints);
     scanner.classList.add('open');
     scanBtn.textContent = 'Close';
-    scanNote.textContent = 'Hold the barcode across the red line';
-    hint.textContent = '';
-    hint.className = 'hint';
-
     try{
       await reader.decodeFromConstraints(
         { video:{ facingMode:{ ideal:'environment' } } },
@@ -708,10 +501,7 @@
           if(!result) return;
           const text = result.getText().toUpperCase().replace(/[^A-Z0-9]/g,'');
           const match = text.match(VIN_RE);
-          if(!match){
-            scanNote.textContent = 'Read a barcode, but no VIN in it — try the other label';
-            return;
-          }
+          if(!match) return;
           vin.value = cleanVin(match[0]);
           stopScan();
           syncVin();
@@ -720,10 +510,6 @@
       );
     }catch(err){
       stopScan();
-      hint.textContent = (err && err.name === 'NotAllowedError')
-        ? 'Camera access is off for this site. Turn it on in your browser settings, or type the VIN.'
-        : 'No camera available here. Type or paste the VIN instead.';
-      hint.className = 'hint warn';
     }
   }
 
