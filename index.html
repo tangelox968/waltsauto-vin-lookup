@@ -182,6 +182,22 @@
     padding-bottom:14px;
     margin-bottom:14px;
   }
+  .results-head-right{display:flex;align-items:center;gap:10px}
+  .close-results{
+    flex:0 0 auto;
+    width:34px;height:34px;
+    padding:0;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    color:var(--text-soft);
+    border:1px solid var(--border-strong);
+    border-radius:999px;
+    font-size:20px;
+    line-height:1;
+  }
+  .close-results:hover{border-color:var(--danger);color:var(--danger)}
   .headline{
     font-family:'Space Grotesk',sans-serif;
     font-weight:700;
@@ -593,7 +609,10 @@
   <section class="results" id="results" aria-live="polite">
     <div class="results-head">
       <h2 class="headline" id="headline">&nbsp;</h2>
-      <span class="stamp" id="checkstamp" hidden>Check digit OK</span>
+      <div class="results-head-right">
+        <span class="stamp" id="checkstamp" hidden>Check digit OK</span>
+        <button class="close-results" id="closeResults" type="button" aria-label="Close and clear">&times;</button>
+      </div>
     </div>
     <dl class="specs" id="specs"></dl>
 
@@ -874,7 +893,7 @@
 
   document.getElementById('print').addEventListener('click', () => window.print());
 
-  document.getElementById('reset').addEventListener('click', () => {
+  function resetAll(){
     stopScan();
     vin.value = ''; miles.value = ''; trimIn.value = ''; current = null;
     results.classList.remove('shown');
@@ -882,7 +901,9 @@
     recallsSec.hidden = true;
     savelogBtn.disabled = true;
     syncVin(); syncOdo(); vin.focus();
-  });
+  }
+  document.getElementById('reset').addEventListener('click', resetAll);
+  document.getElementById('closeResults').addEventListener('click', resetAll);
 
   /* ================= Field log + Google Sheet sync ================= */
   const SHEET_URL_KEY = 'waltsautoSheetUrl';
