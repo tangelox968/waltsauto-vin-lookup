@@ -1311,40 +1311,95 @@
     return out;
   }
 
-  function extractVin(text){
-    const normalize = s => s.toUpperCase()
-      .replace(/O/g,'0').replace(/Q/g,'0').replace(/I/g,'1') // OCR confuses these with digits; VINs never contain them
-      .replace(/[^A-Z0-9]/g,'');
-    const upper = text.toUpperCase();
+  // Position 1 (region) and position 10 (model year) are fixed by the VIN
+  // standard, so they're hard filters, not scoring hints. Check digit alone is
+  // a weak gate — any random 17-char string passes it about 1 time in 11, which
+  // is exactly how OCR noise off a busy sticker got submitted as a real VIN.
+  const YEAR_CODES = 'ABCDEFGHJKLMNPRSTVWXY123456789';
+  function plausibleVin(v){
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(v)) return false;
+    if(v[0] === '0') return false;                    // no region code uses 0
+    if(YEAR_CODES.indexOf(v[9]) === -1) return false; // not a valid year code
+    return checkDigitValid(v);
+  }
 
-    // On a busy door-jamb sticker, restrict the search to right after a literal
-    // "VIN" label when OCR catches one — scanning the whole sticker risks a
-    // GVWR or tire-size number accidentally passing the check-digit test.
-    const labelMatch = upper.match(/VIN\s*[:#.]?\s*([A-Z0-9\s]{17,40})/);
-    if(labelMatch){
-      const region = normalize(labelMatch[1]);
-      const regionCandidates = [];
-      for(let i = 0; i + 17 <= region.length; i++){
-        const chunk = region.slice(i, i + 17);
-        if(/^[A-HJ-NPR-Z0-9]{17}$/.test(chunk)) regionCandidates.push(chunk);
-      }
-      if(regionCandidates.length){
-        const hit = regionCandidates.find(c => checkDigitValid(c));
-        if(hit) return hit;
-      }
+  // Tesseract's line structure lives in different places across versions, and
+  // the flat `text` is the only thing guaranteed present — but we need the line
+  // breaks either way, because collapsing the whole sticker into one string is
+  // what lets a 17-char window straddle two unrelated numbers.
+  function ocrLines(data){
+    const lines = [];
+    const push = l => { if(l && (l.text || '').trim()) lines.push({ text: l.text, conf: l.confidence }); };
+    if(Array.isArray(data.lines)) data.lines.forEach(push);
+    if(!lines.length && Array.isArray(data.blocks)){
+      data.blocks.forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(push)));
     }
+    if(!lines.length){
+      (data.text || '').split(/\r?\n/).forEach(t => push({ text: t }));
+    }
+    return lines;
+  }
 
-    const cleaned = normalize(upper);
-    const candidates = [];
-    for(let i = 0; i + 17 <= cleaned.length; i++){
-      const chunk = cleaned.slice(i, i + 17);
-      if(/^[A-HJ-NPR-Z0-9]{17}$/.test(chunk)) candidates.push(chunk);
+  const normalizeOcr = s => s.toUpperCase()
+    .replace(/[OQ]/g,'0').replace(/I/g,'1') // OCR confuses these with digits; VINs never contain them
+    .replace(/[^A-Z0-9]/g,'');
+
+  // Scores every plausible VIN on a sticker instead of taking the first one
+  // that validates. The discriminator that actually matters is whether the
+  // candidate fills its whole run of characters: a real VIN is exactly 17 long
+  // on its own, while noise candidates are 17-char slices cut out of a longer
+  // run of surrounding text (GVWR, tire sizes, paint codes).
+  function vinCandidates(lines){
+    const out = [];
+    lines.forEach(line => {
+      const raw = (line.text || '').toUpperCase();
+      const labeled = /V[1IL]N/.test(raw); // the char whitelist has no I, so "VIN" reads as V1N/VLN
+      const tokens = raw.split(/\s+/).filter(Boolean);
+      for(let i = 0; i < tokens.length; i++){
+        // Join at most 3 adjacent tokens on the same line — OCR often splits one
+        // VIN across a couple of gaps — but never across a line break.
+        for(let j = i; j < Math.min(i + 3, tokens.length); j++){
+          const run = normalizeOcr(tokens.slice(i, j + 1).join(''));
+          if(run.length < 17 || run.length > 24) continue;
+          for(let k = 0; k + 17 <= run.length; k++){
+            const chunk = run.slice(k, k + 17);
+            if(!plausibleVin(chunk)) continue;
+            let score = run.length === 17 ? 100 : Math.max(0, 40 - (run.length - 17) * 8);
+            if(i === j) score += 25;      // stood alone, no joining needed
+            if(labeled) score += 60;      // sits on a line carrying a "VIN" label
+            if(typeof line.conf === 'number') score += line.conf / 10;
+            out.push({ vin: chunk, score });
+          }
+        }
+      }
+    });
+    return out;
+  }
+
+  // Returns { vin, confident } or null. A non-confident read still gets shown,
+  // but the caller must not auto-submit it.
+  function extractVin(data){
+    const lines = ocrLines(data);
+    const cands = vinCandidates(lines);
+    if(cands.length){
+      const byVin = new Map();
+      cands.forEach(c => {
+        const prev = byVin.get(c.vin);
+        // Same string turning up twice on the sticker is corroboration, not noise.
+        if(prev) prev.score = Math.max(prev.score, c.score) + 10;
+        else byVin.set(c.vin, { vin: c.vin, score: c.score });
+      });
+      const best = Array.from(byVin.values()).sort((a, b) => b.score - a.score)[0];
+      return { vin: best.vin, confident: best.score >= 100 };
     }
-    // Only accept a candidate whose check digit actually validates — with no
-    // real VIN to anchor on, "first 17-char run OCR happened to produce" is
-    // often just noise from glare or background clutter, not a mistyped VIN.
-    // Better to say "couldn't read it" than confidently submit garbage.
-    return candidates.find(c => checkDigitValid(c)) || null;
+    // Fallback for stickers OCR reads as one unbroken blob with no usable
+    // spacing. Windows here can straddle unrelated text, so never confident.
+    const flat = normalizeOcr(lines.map(l => l.text).join(''));
+    for(let i = 0; i + 17 <= flat.length; i++){
+      const chunk = flat.slice(i, i + 17);
+      if(plausibleVin(chunk)) return { vin: chunk, confident: false };
+    }
+    return null;
   }
 
   // Maps the on-screen guide box back to raw video pixels, accounting for
@@ -1393,7 +1448,8 @@
       // Vertically-printed VIN text (common on door jambs) reads as sideways
       // characters in an upright capture — try the upright orientation first
       // since it's the common case, then the two sideways holds, then upside
-      // down last. Stops at the first angle that produces a valid VIN.
+      // down last. Stops early on a confident read; a shaky one is kept but the
+      // remaining angles still get a chance to beat it.
       const angles = [0, 90, 270, 180];
       let found = null;
       for(let i = 0; i < angles.length; i++){
@@ -1402,16 +1458,27 @@
         const rotated = angle === 0 ? shotCanvas : rotateCanvas(shotCanvas, angle);
         const ocrCanvas = preprocessForOcr(rotated);
         const { data } = await worker.recognize(ocrCanvas);
-        found = extractVin(data.text || '');
-        if(found) break;
+        const res = extractVin(data);
+        if(res){
+          if(!found) found = res;
+          if(res.confident){ found = res; break; }
+        }
       }
       if(found){
-        vin.value = cleanVin(found);
+        vin.value = cleanVin(found.vin);
         stopScan();
         syncVin();
-        hint.textContent = 'Read from photo — double check it before decoding.';
-        hint.className = 'hint ok';
-        if(vin.value.length === 17) run();
+        if(found.confident){
+          hint.textContent = 'Read from photo — double check it before decoding.';
+          hint.className = 'hint ok';
+          if(vin.value.length === 17) run();
+        } else {
+          // Read came out of a crowded run of text rather than a clean 17-char
+          // VIN, so it's as likely to be neighbouring label text — don't decode
+          // it automatically the way a clean read gets decoded.
+          hint.textContent = 'Unsure about this read — check every character, then tap Decode.';
+          hint.className = 'hint warn';
+        }
       } else {
         scanNote.textContent = 'Could not read a VIN — retake the photo or type it in';
         captureBtn.disabled = false;
