@@ -6,41 +6,42 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VIN Lookup">
-<meta name="theme-color" content="#090B10">
+<meta name="theme-color" content="#070c13">
 <title>VIN Lookup &mdash; Walt's Auto Sales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#090B10;
-    --panel:#12151D;
-    --panel-2:#171B25;
-    --border:rgba(255,255,255,.08);
-    --border-strong:rgba(255,255,255,.16);
+    --bg:#070c13;
+    --bg-glow-1:rgba(34,211,238,.09);
+    --bg-glow-2:rgba(103,232,249,.04);
+    --panel:#0b121c;
+    --panel-2:#0d1520;
+    --border:#182735;
+    --border-strong:#25394a;
     --text:#EDF1F7;
-    --text-soft:#8891A3;
-    --text-faint:#5C6478;
+    --text-soft:#8fa0b5;
+    --text-faint:#59697d;
     --accent:#22D3EE;
     --accent-strong:#67E8F9;
-    --accent-dim:rgba(34,211,238,.14);
+    --accent-dim:rgba(34,211,238,.12);
     --accent-ink:#062229;
     --warn:#FBBF24;
-    --warn-dim:rgba(251,191,36,.14);
+    --warn-dim:rgba(251,191,36,.12);
     --danger:#FB7185;
-    --danger-dim:rgba(251,113,133,.14);
-    --good:#34D399;
-    --good-dim:rgba(52,211,153,.14);
+    --danger-dim:rgba(251,113,133,.10);
+    --good:#19D99B;
+    --good-dim:rgba(25,217,155,.10);
     --radius:16px;
     --radius-sm:10px;
-    --pad:clamp(18px,4vw,40px);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{
     background:
-      radial-gradient(1100px 560px at 12% -12%, rgba(34,211,238,.10), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(251,113,133,.06), transparent 55%),
+      radial-gradient(1200px 620px at 15% -10%, var(--bg-glow-1), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, var(--bg-glow-2), transparent 55%),
       var(--bg);
     color:var(--text);
     font-family:'Inter',system-ui,sans-serif;
@@ -48,12 +49,58 @@
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
   }
-  .sheet{
-    max-width:760px;
+  .page{
+    max-width:1400px;
     margin:0 auto;
-    padding:max(var(--pad),env(safe-area-inset-top)) var(--pad)
-            calc(64px + env(safe-area-inset-bottom));
+    padding:max(32px,env(safe-area-inset-top)) 32px calc(64px + env(safe-area-inset-bottom));
   }
+  .page > * + *{margin-top:24px}
+
+  /* ---------- shared primitives ---------- */
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px;
+  }
+  label.field-label{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin-bottom:10px;
+  }
+  .btn{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    font-size:13.5px;
+    line-height:1;
+    cursor:pointer;
+    border-radius:var(--radius-sm);
+    padding:15px 22px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:1px solid transparent;
+    white-space:nowrap;
+    transition:background .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease,opacity .15s ease;
+  }
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn[hidden]{display:none}
+  .btn-sm{padding:9px 16px;font-size:12px}
+  .btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn-primary:hover{box-shadow:0 0 0 4px var(--accent-dim), 0 8px 24px -10px rgba(34,211,238,.55)}
+  .btn-primary:disabled{background:var(--panel-2);border-color:var(--border);color:var(--text-faint);cursor:not-allowed;box-shadow:none}
+  .btn-outline{background:transparent;color:var(--text);border-color:var(--border-strong)}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent-strong)}
+  .btn-outline:disabled{opacity:.4;cursor:not-allowed;border-color:var(--border);color:var(--text-faint)}
+  .btn-muted{background:transparent;color:var(--text-faint);border-color:var(--border)}
+  .btn-muted:hover{color:var(--text-soft);border-color:var(--border-strong)}
 
   /* ---------- masthead ---------- */
   .masthead{
@@ -62,64 +109,49 @@
     justify-content:space-between;
     gap:16px;
     flex-wrap:wrap;
-    padding-bottom:22px;
-    border-bottom:1px solid var(--border);
   }
+  .brand{display:flex;flex-direction:column;gap:7px}
   .lockup{
     font-family:'Space Grotesk',sans-serif;
     font-weight:700;
-    font-size:clamp(22px,4.4vw,32px);
+    font-size:clamp(22px,3.6vw,28px);
     letter-spacing:.01em;
-    line-height:1;
+    line-height:1.15;
     margin:0;
   }
-  .lockup span{color:var(--accent);font-weight:500;margin:0 .1em}
-  .masthead-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .lockup span{color:var(--accent);font-weight:600;margin-left:.4em}
   .eyebrow{
     font-family:'JetBrains Mono',monospace;
     font-size:11px;
-    letter-spacing:.2em;
+    letter-spacing:.18em;
     text-transform:uppercase;
     color:var(--text-faint);
     display:inline-flex;
     align-items:center;
-    gap:8px;
+    gap:6px;
+    margin:0;
   }
-  .eyebrow::before{
-    content:'';
-    width:6px;height:6px;border-radius:50%;
-    background:var(--accent);
-    box-shadow:0 0 8px 1px rgba(34,211,238,.7);
-  }
+  .eyebrow svg{width:12px;height:12px;color:var(--accent);flex:0 0 auto}
 
   /* ---------- vin entry ---------- */
-  .entry{padding:28px 0 8px}
-  label.field-label{
-    display:block;
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    color:var(--text-faint);
-    margin-bottom:10px;
-  }
-  .vin-row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
-  .vin-wrap{position:relative;flex:1 1 420px;min-width:0}
+  .vin-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
+  .vin-wrap{position:relative;flex:1 1 380px;min-width:0}
   #vin{
     width:100%;
-    background:var(--panel);
+    height:100%;
+    background:var(--panel-2);
     border:1px solid var(--border);
     border-radius:var(--radius-sm);
     padding:16px 76px 16px 16px;
     font-family:'JetBrains Mono',monospace;
-    font-weight:500;
-    font-size:clamp(18px,3.4vw,25px);
-    letter-spacing:.14em;
+    font-weight:600;
+    font-size:clamp(18px,3vw,24px);
+    letter-spacing:.12em;
     text-transform:uppercase;
     color:var(--text);
     transition:border-color .15s ease, box-shadow .15s ease;
   }
-  #vin::placeholder{color:var(--text-faint);letter-spacing:.14em}
+  #vin::placeholder{color:var(--text-faint);letter-spacing:.12em}
   #vin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-dim)}
   .count{
     position:absolute;
@@ -132,28 +164,8 @@
     pointer-events:none;
   }
   .count.full{color:var(--accent);font-weight:700}
-  button{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:600;
-    letter-spacing:.03em;
-    text-transform:uppercase;
-    font-size:14.5px;
-    cursor:pointer;
-    border-radius:var(--radius-sm);
-    transition:background .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease,opacity .15s ease;
-  }
-  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  #decode{
-    flex:0 0 auto;
-    padding:0 26px;
-    background:var(--accent);
-    color:var(--accent-ink);
-    border:1px solid var(--accent);
-  }
-  #decode:hover{box-shadow:0 0 0 4px var(--accent-dim), 0 8px 24px -8px rgba(34,211,238,.6)}
-  #decode:disabled{background:var(--panel-2);border-color:var(--border);color:var(--text-faint);cursor:not-allowed;box-shadow:none}
   .hint{
-    margin:10px 0 0;
+    margin:14px 0 0;
     font-size:13.5px;
     color:var(--text-soft);
     min-height:20px;
@@ -162,25 +174,16 @@
   .hint.ok{color:var(--good)}
 
   /* ---------- results ---------- */
-  .results{
-    margin-top:32px;
-    display:none;
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:24px;
-    box-shadow:0 24px 60px -32px rgba(0,0,0,.7);
-  }
+  .results{display:none}
   .results.shown{display:block}
+  .results > * + *{margin-top:20px}
   .results-head{
     display:flex;
-    align-items:flex-end;
+    align-items:flex-start;
     justify-content:space-between;
     gap:14px;
     flex-wrap:wrap;
-    border-bottom:1px solid var(--border);
-    padding-bottom:14px;
-    margin-bottom:14px;
+    margin-bottom:20px;
   }
   .results-head-right{display:flex;align-items:center;gap:10px}
   .close-results{
@@ -196,67 +199,92 @@
     border-radius:999px;
     font-size:20px;
     line-height:1;
+    cursor:pointer;
+    transition:border-color .15s ease,color .15s ease;
   }
   .close-results:hover{border-color:var(--danger);color:var(--danger)}
   .headline{
     font-family:'Space Grotesk',sans-serif;
     font-weight:700;
-    font-size:clamp(24px,5vw,36px);
-    line-height:1.1;
+    font-size:clamp(24px,4vw,34px);
+    line-height:1.15;
     letter-spacing:0;
     margin:0;
   }
   .stamp{
     font-family:'JetBrains Mono',monospace;
     font-size:11px;
-    letter-spacing:.1em;
+    letter-spacing:.08em;
     text-transform:uppercase;
     color:var(--good);
     background:var(--good-dim);
-    border:1px solid rgba(52,211,153,.35);
-    padding:5px 10px;
+    border:1px solid rgba(25,217,155,.35);
+    padding:7px 12px 7px 10px;
     border-radius:999px;
     white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
   }
+  .stamp::before{content:'\2713';font-weight:700}
+
   dl.specs{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+    grid-template-columns:repeat(2,1fr);
     gap:0 28px;
     margin:0;
   }
   .spec{
     display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:12px;
+    align-items:flex-start;
+    gap:14px;
     border-bottom:1px solid var(--border);
-    padding:11px 0;
+    padding:16px 0;
   }
+  .spec-icon{
+    flex:0 0 auto;
+    width:34px;height:34px;
+    border-radius:10px;
+    background:var(--accent-dim);
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .spec-icon svg{width:17px;height:17px}
+  .spec-body{display:flex;flex-direction:column;gap:3px;min-width:0}
   .spec dt{
     font-family:'JetBrains Mono',monospace;
-    font-size:10.5px;
-    letter-spacing:.14em;
+    font-size:10px;
+    letter-spacing:.12em;
     text-transform:uppercase;
     color:var(--text-faint);
-    white-space:nowrap;
   }
   .spec dd{
     margin:0;
     font-weight:600;
-    text-align:right;
+    font-size:15px;
     color:var(--text);
+    word-break:break-word;
+  }
+  @media (max-width:640px){
+    dl.specs{grid-template-columns:1fr}
   }
 
   /* ---------- recalls ---------- */
-  .recalls{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
   .recalls h3{
+    display:flex;
+    align-items:center;
+    gap:8px;
     font-family:'Space Grotesk',sans-serif;
     font-weight:600;
-    font-size:16px;
-    letter-spacing:.01em;
-    margin:0 0 12px;
-    color:var(--text);
+    font-size:13px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin:0 0 14px;
+    color:var(--text-soft);
   }
+  .recalls h3 svg{width:16px;height:16px;color:var(--danger);flex:0 0 auto}
   .recall-cta{
     display:flex;
     align-items:center;
@@ -278,18 +306,8 @@
   .recall-sub{font-size:12px;color:var(--text-faint);margin:10px 0 0}
 
   /* ---------- scanner (barcode + photo) ---------- */
-  #scan,#photo{
-    flex:0 0 auto;
-    padding:0 20px;
-    background:transparent;
-    color:var(--text);
-    border:1px solid var(--border-strong);
-  }
-  #scan:hover,#photo:hover{border-color:var(--accent);color:var(--accent-strong)}
   #scan[hidden],#photo[hidden]{display:none}
-  .scanner{
-    display:none;
-  }
+  .scanner{display:none}
   .scanner.open{
     display:flex;
     flex-direction:column;
@@ -332,7 +350,7 @@
     justify-content:space-between;
     gap:12px;
     flex-wrap:wrap;
-    margin-top:10px;
+    margin-top:14px;
   }
   .scanner.open .scan-bar{
     flex:0 0 auto;
@@ -349,28 +367,14 @@
   }
   .scanner.open .scan-note{color:var(--text)}
   .scan-buttons{display:flex;gap:10px;flex-wrap:wrap}
-  #capture{
-    background:var(--accent);
-    color:var(--accent-ink);
-    border:1px solid var(--accent);
-    padding:12px 22px;
-  }
-  #capture:hover{box-shadow:0 0 0 4px var(--accent-dim)}
-  #capture:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
   #capture[hidden]{display:none}
-  #stopscan{
-    background:transparent;
-    color:var(--text-soft);
-    border:1px solid var(--border-strong);
-    padding:12px 22px;
-  }
-  #stopscan:hover{border-color:var(--text-soft);color:var(--text)}
+
+  /* ---------- odometer + trim ---------- */
   .meta-row{
     display:flex;
     gap:clamp(24px,5vw,48px);
     flex-wrap:wrap;
     align-items:flex-start;
-    margin-top:28px;
   }
   .odo-block{flex:0 0 auto}
   .trim-block{flex:1 1 260px;min-width:0}
@@ -396,29 +400,29 @@
   .odo{
     position:relative;
     display:inline-flex;
-    gap:3px;
+    gap:4px;
     padding:10px;
-    background:#000;
+    background:#04070c;
     border:1px solid var(--border);
     border-radius:var(--radius-sm);
     cursor:text;
   }
   .odo:focus-within{outline:none;box-shadow:0 0 0 4px var(--accent-dim)}
   .digit{
-    width:clamp(30px,7.5vw,42px);
-    padding:8px 0;
+    width:clamp(30px,7vw,40px);
+    padding:10px 0;
     text-align:center;
-    background:#05070A;
+    background:#070c13;
     color:var(--accent);
-    text-shadow:0 0 10px rgba(34,211,238,.55);
+    text-shadow:0 0 10px rgba(34,211,238,.5);
     font-family:'JetBrains Mono',monospace;
     font-weight:700;
-    font-size:clamp(22px,5.6vw,32px);
+    font-size:clamp(20px,5.4vw,30px);
     line-height:1;
-    border-radius:4px;
+    border-radius:6px;
   }
-  .digit.lead{color:#2B323E;text-shadow:none}
-  .digit.tenth{background:#05070A;color:var(--warn);text-shadow:0 0 10px rgba(251,191,36,.55)}
+  .digit.lead{color:#28384a;text-shadow:none}
+  .digit.tenth{background:#070c13;color:var(--warn);text-shadow:0 0 10px rgba(251,191,36,.5)}
   #miles{
     position:absolute;
     inset:0;
@@ -437,17 +441,18 @@
     margin-left:12px;
   }
 
-  /* ---------- summary ---------- */
-  .actions{margin-top:32px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .ghost{
-    background:transparent;
-    color:var(--text);
-    border:1px solid var(--border-strong);
-    padding:11px 20px;
+  /* ---------- notes / summary ---------- */
+  .summary{
+    margin:0;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    line-height:1.7;
+    color:var(--text-soft);
+    word-break:break-word;
   }
-  .ghost:hover{border-color:var(--accent);color:var(--accent-strong)}
-  .ghost:disabled{opacity:.4;cursor:not-allowed;border-color:var(--border);color:var(--text-faint)}
-  .ghost.small{padding:7px 14px;font-size:12.5px}
+
+  /* ---------- actions ---------- */
+  .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   .sync-toggle{
     display:inline-flex;
     align-items:center;
@@ -465,18 +470,6 @@
     cursor:pointer;
   }
   .sync-toggle[hidden]{display:none}
-  .summary{
-    margin-top:18px;
-    background:var(--panel-2);
-    border-left:3px solid var(--accent);
-    border-radius:0 var(--radius-sm) var(--radius-sm) 0;
-    padding:14px 16px;
-    font-family:'JetBrains Mono',monospace;
-    font-size:13px;
-    line-height:1.7;
-    color:var(--text-soft);
-    word-break:break-word;
-  }
   .toast{
     font-family:'JetBrains Mono',monospace;
     font-size:12px;
@@ -489,17 +482,16 @@
   .toast.on{opacity:1}
 
   /* ---------- field log ---------- */
-  .logsec{margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
   .logsec h2{
     font-family:'Space Grotesk',sans-serif;
     font-weight:700;
-    font-size:19px;
+    font-size:17px;
     letter-spacing:0;
     margin:0 0 4px;
     color:var(--text);
   }
-  .logbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:14px}
-  .loglist{margin-top:10px}
+  .logbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .loglist{margin-top:12px}
   .logrow{
     display:flex;
     justify-content:space-between;
@@ -509,6 +501,7 @@
     font-family:'JetBrains Mono',monospace;
     font-size:12.5px;
   }
+  .logrow:last-child{border-bottom:none}
   .logrow .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-soft)}
   .logrow .status{flex:0 0 auto;color:var(--text-faint)}
   .logrow .status.pending{color:var(--warn)}
@@ -540,10 +533,10 @@
     font-size:20px;
     color:var(--text);
   }
+  .modal .actions{margin-top:16px}
   .modal-status{margin:10px 0 0;font-size:13px;min-height:18px}
 
   footer{
-    margin-top:48px;
     padding-top:14px;
     border-top:1px solid var(--border);
     font-family:'JetBrains Mono',monospace;
@@ -558,24 +551,27 @@
   }
   @media print{
     body{background:#fff}
-    #decode,.actions,.hint,footer,.logsec,.masthead-right{display:none}
+    #decode,.actions,.hint,footer,.logsec,#openSetup,.close-results,#scan,#photo{display:none}
     .odo{background:#fff;border:1px solid #000}
     .digit{background:#fff;color:#000;text-shadow:none}
   }
 </style>
 </head>
 <body>
-<main class="sheet">
+<main class="page">
 
   <header class="masthead">
-    <h1 class="lockup">Walt's Auto <span>&mdash;</span> VIN Lookup</h1>
-    <div class="masthead-right">
-      <p class="eyebrow" style="margin:0">San Angelo, TX</p>
-      <button class="ghost small" id="openSetup" type="button">Sheet setup</button>
+    <div class="brand">
+      <h1 class="lockup">Walt's Auto<span>VIN Lookup</span></h1>
+      <p class="eyebrow">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 18s6-5.5 6-10a6 6 0 1 0-12 0c0 4.5 6 10 6 10Z"/><circle cx="10" cy="8" r="2.2"/></svg>
+        San Angelo, TX
+      </p>
     </div>
+    <button class="btn btn-outline btn-sm" id="openSetup" type="button">Sheet setup</button>
   </header>
 
-  <section class="entry">
+  <section class="entry card">
     <label class="field-label" for="vin">Vehicle identification number</label>
     <div class="vin-row">
       <div class="vin-wrap">
@@ -584,9 +580,9 @@
              maxlength="17" placeholder="1FTEW1EP7JF..." aria-describedby="vin-hint">
         <span class="count" id="count" aria-hidden="true">0 / 17</span>
       </div>
-      <button id="scan" type="button" hidden>Scan</button>
-      <button id="photo" type="button" hidden>Photo</button>
-      <button id="decode" type="button" disabled>Decode</button>
+      <button class="btn btn-outline" id="scan" type="button" hidden>Scan</button>
+      <button class="btn btn-outline" id="photo" type="button" hidden>Photo</button>
+      <button class="btn btn-primary" id="decode" type="button" disabled>Decode</button>
     </div>
     <p class="hint" id="vin-hint" role="status">Type or paste the VIN off the door jamb, dash, or title.</p>
 
@@ -599,25 +595,31 @@
       <div class="scan-bar">
         <span class="scan-note" id="scan-note">Get the barcode inside the box — any direction works</span>
         <div class="scan-buttons">
-          <button id="capture" type="button" hidden>Capture</button>
-          <button id="stopscan" type="button">Cancel</button>
+          <button class="btn btn-primary" id="capture" type="button" hidden>Capture</button>
+          <button class="btn btn-outline" id="stopscan" type="button">Cancel</button>
         </div>
       </div>
     </div>
   </section>
 
   <section class="results" id="results" aria-live="polite">
-    <div class="results-head">
-      <h2 class="headline" id="headline">&nbsp;</h2>
-      <div class="results-head-right">
-        <span class="stamp" id="checkstamp" hidden>Check digit OK</span>
-        <button class="close-results" id="closeResults" type="button" aria-label="Close and clear">&times;</button>
-      </div>
-    </div>
-    <dl class="specs" id="specs"></dl>
 
-    <div class="recalls" id="recalls" hidden>
-      <h3>Recalls</h3>
+    <div class="card">
+      <div class="results-head">
+        <h2 class="headline" id="headline">&nbsp;</h2>
+        <div class="results-head-right">
+          <span class="stamp" id="checkstamp" hidden>Check digit OK</span>
+          <button class="close-results" id="closeResults" type="button" aria-label="Close and clear">&times;</button>
+        </div>
+      </div>
+      <dl class="specs" id="specs"></dl>
+    </div>
+
+    <div class="card recalls" id="recalls" hidden>
+      <h3>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 2 17h16L10 3Z"/><line x1="10" y1="8.5" x2="10" y2="12"/><circle cx="10" cy="14.3" r=".9" fill="currentColor" stroke="none"/></svg>
+        Recalls
+      </h3>
       <a class="recall-cta" id="recallCta" href="#" target="_blank" rel="noopener">
         <span>Check open recalls for this VIN</span>
         <span class="arrow" aria-hidden="true">&rarr;</span>
@@ -625,43 +627,50 @@
       <p class="recall-sub">Opens NHTSA's official VIN lookup in a new tab — the only source for real unrepaired-recall status.</p>
     </div>
 
-    <div class="meta-row">
-      <div class="odo-block">
-        <label class="field-label" for="miles">Odometer reading</label>
-        <div class="odo" id="odo">
-          <span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit tenth">0</span>
-          <input id="miles" type="text" inputmode="numeric" autocomplete="off" maxlength="6" aria-label="Odometer reading in miles">
+    <div class="card">
+      <div class="meta-row">
+        <div class="odo-block">
+          <label class="field-label" for="miles">Odometer reading</label>
+          <div class="odo" id="odo">
+            <span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit lead">0</span><span class="digit tenth">0</span>
+            <input id="miles" type="text" inputmode="numeric" autocomplete="off" maxlength="6" aria-label="Odometer reading in miles">
+          </div>
+          <span class="odo-unit">Miles</span>
         </div>
-        <span class="odo-unit">Miles</span>
-      </div>
 
-      <div class="trim-block">
-        <label class="field-label" for="trim">Trim or package &mdash; optional</label>
-        <input id="trim" class="text-field" type="text" autocomplete="off" maxlength="60"
-               placeholder="XLT, Z71, Sport, Limited…" aria-describedby="trim-sub">
-        <p class="sub" id="trim-sub">Fills in from the VIN when NHTSA has it. Type over it to correct or add a package.</p>
+        <div class="trim-block">
+          <label class="field-label" for="trim">Trim or package &mdash; optional</label>
+          <input id="trim" class="text-field" type="text" autocomplete="off" maxlength="60"
+                 placeholder="XLT, Z71, Sport, Limited…" aria-describedby="trim-sub">
+          <p class="sub" id="trim-sub">Fills in from the VIN when NHTSA has it. Type over it to correct or add a package.</p>
+        </div>
       </div>
     </div>
 
+    <div class="card">
+      <label class="field-label">Notes / summary</label>
+      <p class="summary" id="summary"></p>
+    </div>
+
     <div class="actions">
-      <button class="ghost" id="savelog" type="button" disabled>Save to Sheet</button>
+      <button class="btn btn-primary" id="savelog" type="button" disabled>Save to Sheet</button>
       <label class="sync-toggle" id="syncToggleWrap" hidden>
         <input type="checkbox" id="syncToggle" checked>
         <span>Sync this one to Sheet</span>
       </label>
-      <button class="ghost" id="copy" type="button">Copy summary</button>
-      <button class="ghost" id="print" type="button">Print</button>
-      <button class="ghost" id="reset" type="button">Clear</button>
+      <button class="btn btn-outline" id="copy" type="button">Copy summary</button>
+      <button class="btn btn-outline" id="print" type="button">Print</button>
+      <button class="btn btn-muted" id="reset" type="button">Clear</button>
       <span class="toast" id="toast">Copied</span>
     </div>
-    <p class="summary" id="summary"></p>
+
   </section>
 
-  <section class="logsec">
+  <section class="logsec card">
     <h2>Field Log</h2>
     <p class="sub" id="logStatus">No entries saved yet on this phone.</p>
     <div class="logbar">
-      <button class="ghost small" id="retrySync" type="button" hidden>Retry sync</button>
+      <button class="btn btn-outline btn-sm" id="retrySync" type="button" hidden>Retry sync</button>
     </div>
     <div class="loglist" id="logList"></div>
   </section>
@@ -675,10 +684,10 @@
     <p class="sub">Paste the Web App URL from your Google Apps Script deployment. Every vehicle you save always stays on this phone; adding this URL also syncs it to your Google Sheet automatically.</p>
     <label class="field-label" for="sheetUrlInput" style="margin-top:14px">Web app URL</label>
     <input id="sheetUrlInput" class="text-field" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
-    <div class="actions" style="margin-top:16px">
-      <button class="ghost" id="saveSheetUrl" type="button">Save</button>
-      <button class="ghost" id="clearSheetUrl" type="button">Remove</button>
-      <button class="ghost" id="closeModal" type="button">Close</button>
+    <div class="actions">
+      <button class="btn btn-primary" id="saveSheetUrl" type="button">Save</button>
+      <button class="btn btn-muted" id="clearSheetUrl" type="button">Remove</button>
+      <button class="btn btn-outline" id="closeModal" type="button">Close</button>
     </div>
     <p class="modal-status" id="modalStatus"></p>
   </div>
@@ -781,6 +790,39 @@
     ['GVWR','GVWR']
   ];
 
+  // Small hardcoded (trusted) icon per spec label — purely decorative, never
+  // built from NHTSA response data, so it's safe to set via innerHTML.
+  const SPEC_ICONS = {
+    'Body': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l1.4-4.6A2 2 0 0 1 6.3 6h7.4a2 2 0 0 1 1.9 1.4L17 12"/><rect x="2.3" y="12" width="15.4" height="3.6" rx="1.2"/><circle cx="6" cy="15.6" r="1.3"/><circle cx="14" cy="15.6" r="1.3"/></svg>',
+    'Doors': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="11" height="15" rx="1.4"/><circle cx="12.5" cy="10" r=".9" fill="currentColor" stroke="none"/></svg>',
+    'Engine': '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M11.2 1.8 4 11.3h5l-1.1 6.9 8.1-10.4h-5l.2-6Z"/></svg>',
+    'Cylinders': '<svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="8.5" width="2.6" height="8.5"/><rect x="6.8" y="5.5" width="2.6" height="11.5"/><rect x="11.6" y="8.5" width="2.6" height="8.5"/><rect x="16.4" y="2.5" width="2.6" height="14.5"/></svg>',
+    'Fuel': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M10 2.3S4.2 9.8 4.2 13.4a5.8 5.8 0 0 0 11.6 0C15.8 9.8 10 2.3 10 2.3Z"/></svg>',
+    'Drive': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="7.3"/><path d="M10 3.2v4M10 12.8v4M3.2 10h4M12.8 10h4"/><circle cx="10" cy="10" r="1.6" fill="currentColor" stroke="none"/></svg>',
+    'Transmission': '<svg viewBox="0 0 20 20" fill="currentColor"><rect x="2.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="2.4" y="11.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="11.4" width="6.2" height="6.2" rx="1.4"/></svg>',
+    'Trim': '<svg viewBox="0 0 20 20" fill="currentColor"><rect x="2.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="2.4" y="11.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="11.4" width="6.2" height="6.2" rx="1.4"/></svg>',
+    'Series': '<svg viewBox="0 0 20 20" fill="currentColor"><rect x="2.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="2.4" width="6.2" height="6.2" rx="1.4"/><rect x="2.4" y="11.4" width="6.2" height="6.2" rx="1.4"/><rect x="11.4" y="11.4" width="6.2" height="6.2" rx="1.4"/></svg>',
+    'Built in': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17.2V9.3l3.9-2.4v2.4l3.9-2.4v2.4l3.9-2.4v10.3H2.5Z"/><line x1="13.7" y1="4.6" x2="13.7" y2="7"/></svg>',
+    'GVWR': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v13.4M4.3 6.2h11.4M4.3 6.2 2.4 10.3a2 2 0 0 0 3.9 0L4.3 6.2ZM15.7 6.2l-1.9 4.1a2 2 0 0 0 3.9 0l-2-4.1Z"/></svg>',
+    'VIN': '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 9.6 9.6 2.4h5.9A2 2 0 0 1 17.5 4.3v5.9L10.3 17.5a2 2 0 0 1-2.8 0L2.4 12.4a2 2 0 0 1 0-2.8Z"/><circle cx="13" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg>'
+  };
+  const SPEC_ICON_DEFAULT = '<svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="3"/></svg>';
+
+  function addSpec(label, val){
+    const wrap = document.createElement('div');
+    wrap.className = 'spec';
+    const icon = document.createElement('span');
+    icon.className = 'spec-icon';
+    icon.innerHTML = SPEC_ICONS[label] || SPEC_ICON_DEFAULT;
+    const body = document.createElement('div');
+    body.className = 'spec-body';
+    const dt = document.createElement('dt'); dt.textContent = label;
+    const dd = document.createElement('dd'); dd.textContent = val;
+    body.append(dt, dd);
+    wrap.append(icon, body);
+    specs.append(wrap);
+  }
+
   async function run(){
     const v = vin.value;
     decodeBtn.disabled = true;
@@ -836,19 +878,9 @@
     FIELDS.forEach(([label,key]) => {
       const val = key.startsWith('__') ? extra[key] : r[key];
       if(!val || String(val).trim() === '' || val === 'Not Applicable') return;
-      const wrap = document.createElement('div');
-      wrap.className = 'spec';
-      const dt = document.createElement('dt'); dt.textContent = label;
-      const dd = document.createElement('dd'); dd.textContent = val;
-      wrap.append(dt, dd);
-      specs.append(wrap);
+      addSpec(label, val);
     });
-    const wrap = document.createElement('div');
-    wrap.className = 'spec';
-    const dt = document.createElement('dt'); dt.textContent = 'VIN';
-    const dd = document.createElement('dd'); dd.textContent = v;
-    wrap.append(dt, dd);
-    specs.append(wrap);
+    addSpec('VIN', v);
 
     stamp.hidden = !checkDigitValid(v);
     trimIn.value = current.trim;
