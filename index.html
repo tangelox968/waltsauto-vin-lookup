@@ -303,6 +303,13 @@
     min-height:0;
   }
   .viewport video{width:100%;height:100%;object-fit:cover;display:block}
+  .frame-guide{
+    position:absolute;
+    inset:14% 8%;
+    border:2px dashed rgba(34,211,238,.6);
+    border-radius:14px;
+    pointer-events:none;
+  }
   .scan-bar{
     display:flex;
     align-items:center;
@@ -570,10 +577,11 @@
     <div class="scanner" id="scanner">
       <div class="viewport">
         <video id="video" playsinline autoplay muted></video>
+        <div class="frame-guide" aria-hidden="true"></div>
       </div>
       <canvas id="shot" hidden></canvas>
       <div class="scan-bar">
-        <span class="scan-note" id="scan-note">Hold the barcode in view — any direction works</span>
+        <span class="scan-note" id="scan-note">Get the barcode inside the box — any direction works</span>
         <div class="scan-buttons">
           <button id="capture" type="button" hidden>Capture</button>
           <button id="stopscan" type="button">Cancel</button>
@@ -1029,6 +1037,7 @@
   const captureBtn = document.getElementById('capture');
   const scanner  = document.getElementById('scanner');
   const video    = document.getElementById('video');
+  const viewport = document.querySelector('.viewport');
   const shotCanvas = document.getElementById('shot');
   const scanNote = document.getElementById('scan-note');
   const VIN_RE   = /[A-HJ-NPR-Z0-9]{17}/;
@@ -1136,7 +1145,7 @@
     scanner.classList.add('open');
     document.body.style.overflow = 'hidden';
     scanBtn.textContent = 'Close';
-    scanNote.textContent = 'Hold the barcode in view — any direction works';
+    scanNote.textContent = 'Get the barcode inside the box — any direction works';
     captureBtn.hidden = true;
     hint.textContent = '';
     hint.className = 'hint';
@@ -1161,7 +1170,7 @@
     scanner.classList.add('open');
     document.body.style.overflow = 'hidden';
     photoBtn.textContent = 'Close';
-    scanNote.textContent = 'No barcode? Center the VIN text, then tap Capture';
+    scanNote.textContent = 'Fit the VIN text inside the box, then tap Capture';
     captureBtn.hidden = false;
     hint.textContent = '';
     hint.className = 'hint';
@@ -1203,13 +1212,40 @@
     return candidates.find(c => checkDigitValid(c)) || candidates[0];
   }
 
+  // Maps the on-screen guide box back to raw video pixels, accounting for
+  // the crop `object-fit:cover` applies when the feed's aspect ratio doesn't
+  // match the viewport's — otherwise the box wouldn't line up with what OCR
+  // actually reads, and clutter outside it would still get scanned.
+  function guideCropRect(){
+    const vw = video.videoWidth || 1280;
+    const vh = video.videoHeight || 720;
+    const cw = viewport.clientWidth || vw;
+    const ch = viewport.clientHeight || vh;
+    const videoAspect = vw / vh;
+    const containerAspect = cw / ch;
+    let visW, visH, offX, offY;
+    if(videoAspect > containerAspect){
+      visH = vh; visW = vh * containerAspect;
+      offY = 0; offX = (vw - visW) / 2;
+    } else {
+      visW = vw; visH = vw / containerAspect;
+      offX = 0; offY = (vh - visH) / 2;
+    }
+    const xPad = 0.08, yPad = 0.14;
+    return {
+      x: offX + visW * xPad,
+      y: offY + visH * yPad,
+      w: visW * (1 - xPad * 2),
+      h: visH * (1 - yPad * 2)
+    };
+  }
+
   async function capturePhoto(){
     if(!mediaStream) return;
-    const w = video.videoWidth || 1280;
-    const h = video.videoHeight || 720;
-    shotCanvas.width = w;
-    shotCanvas.height = h;
-    shotCanvas.getContext('2d').drawImage(video, 0, 0, w, h);
+    const rect = guideCropRect();
+    shotCanvas.width = rect.w;
+    shotCanvas.height = rect.h;
+    shotCanvas.getContext('2d').drawImage(video, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
 
     captureBtn.disabled = true;
     scanNote.textContent = 'Reading photo…';
