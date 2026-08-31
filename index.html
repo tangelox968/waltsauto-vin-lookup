@@ -1328,7 +1328,10 @@
         const chunk = region.slice(i, i + 17);
         if(/^[A-HJ-NPR-Z0-9]{17}$/.test(chunk)) regionCandidates.push(chunk);
       }
-      if(regionCandidates.length) return regionCandidates.find(c => checkDigitValid(c)) || regionCandidates[0];
+      if(regionCandidates.length){
+        const hit = regionCandidates.find(c => checkDigitValid(c));
+        if(hit) return hit;
+      }
     }
 
     const cleaned = normalize(upper);
@@ -1337,8 +1340,11 @@
       const chunk = cleaned.slice(i, i + 17);
       if(/^[A-HJ-NPR-Z0-9]{17}$/.test(chunk)) candidates.push(chunk);
     }
-    if(!candidates.length) return null;
-    return candidates.find(c => checkDigitValid(c)) || candidates[0];
+    // Only accept a candidate whose check digit actually validates — with no
+    // real VIN to anchor on, "first 17-char run OCR happened to produce" is
+    // often just noise from glare or background clutter, not a mistyped VIN.
+    // Better to say "couldn't read it" than confidently submit garbage.
+    return candidates.find(c => checkDigitValid(c)) || null;
   }
 
   // Maps the on-screen guide box back to raw video pixels, accounting for
