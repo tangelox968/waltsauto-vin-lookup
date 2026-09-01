@@ -513,6 +513,24 @@
   }
   .logbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px}
   .loglist{margin-top:12px}
+  .scanstats{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+  .scanstats h3{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin:0 0 12px;
+  }
+  .statline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    line-height:1.7;
+    color:var(--text-soft);
+    margin:0 0 4px;
+  }
+  .statline b{color:var(--text);font-weight:600}
+  .statnote{font-size:12px;line-height:1.5;color:var(--text-faint);margin:10px 0 12px}
   .logrow{
     display:flex;
     justify-content:space-between;
@@ -696,6 +714,13 @@
       <button class="btn btn-outline btn-sm" id="retrySync" type="button" hidden>Retry sync</button>
     </div>
     <div class="loglist" id="logList"></div>
+    <div class="scanstats" id="scanStats" hidden>
+      <h3>Scan history &middot; this phone only</h3>
+      <p class="statline" id="statBarcode"></p>
+      <p class="statline" id="statPhoto"></p>
+      <p class="statnote" id="statNote"></p>
+      <button class="btn btn-muted btn-sm" id="resetStats" type="button">Reset counts</button>
+    </div>
   </section>
 
   <footer>Vehicle data and recall notices from NHTSA &middot; decoded specs are factory build data, not condition</footer>
@@ -846,8 +871,29 @@
     specs.append(wrap);
   }
 
+  // Set when a photo read fills the VIN box, cleared once that read has been
+  // judged. If the VIN finally decoded differs from what OCR read, the read was
+  // wrong and you fixed it — the honest accuracy signal, as opposed to merely
+  // having produced something.
+  let lastPhotoRead = null;
+
+  // Only a near-miss counts. A VIN differing in a few characters is you fixing
+  // this read; a wholly different one means you moved on to another vehicle.
+  function isCorrectionOf(read, typed){
+    if(!read || !typed || read.length !== typed.length) return false;
+    let diff = 0;
+    for(let i = 0; i < read.length; i++) if(read[i] !== typed[i]) diff++;
+    return diff > 0 && diff <= 5;
+  }
+
   async function run(){
     const v = vin.value;
+    // An exact match leaves the flag set on purpose: a confident read decodes
+    // itself, and you may only spot the bad character after seeing the result.
+    if(lastPhotoRead && v !== lastPhotoRead){
+      if(isCorrectionOf(lastPhotoRead, v)) bumpStat('photo', 'corrected');
+      lastPhotoRead = null;
+    }
     decodeBtn.disabled = true;
     decodeBtn.textContent = 'Reading';
     hint.textContent = 'Checking the VIN against the NHTSA database…';
@@ -964,6 +1010,67 @@
   const SHEET_URL_KEY = 'waltsautoSheetUrl';
   const LOG_KEY = 'waltsautoVinLog';
 
+  /* --- scan history ---
+     Plain counters so how often scanning actually works stops being a guess.
+     Counts only: no VINs, no images, nothing leaves the phone. Totals are
+     derived from the parts rather than stored alongside them, so they can't
+     drift out of agreement. */
+  const SCAN_STATS_KEY = 'waltsautoScanStats';
+  function blankStats(){
+    return {
+      photo:   { confident:0, unsure:0, none:0, corrected:0, viaFallback:0 },
+      barcode: { vin:0, nonVin:0, noRead:0 }
+    };
+  }
+  function loadStats(){
+    const base = blankStats();
+    try{
+      const raw = JSON.parse(localStorage.getItem(SCAN_STATS_KEY) || 'null');
+      if(raw) Object.keys(base).forEach(sec => Object.assign(base[sec], raw[sec] || {}));
+    }catch(err){ /* unreadable or private mode — start from zero */ }
+    return base;
+  }
+  function bumpStat(section, field){
+    const s = loadStats();
+    s[section][field]++;
+    try{ localStorage.setItem(SCAN_STATS_KEY, JSON.stringify(s)); }catch(err){ /* private mode */ }
+    renderStats();
+  }
+  function pct(n, d){ return d ? Math.round(n * 100 / d) + '%' : '—'; }
+  function plural(n, word){ return n + ' ' + word + (n === 1 ? '' : 's'); }
+
+  function renderStats(){
+    const s = loadStats();
+    const b = s.barcode, p = s.photo;
+    const scans = b.vin + b.nonVin + b.noRead;
+    const photos = p.confident + p.unsure + p.none;
+    if(!scans && !photos){ scanStats.hidden = true; return; }
+    scanStats.hidden = false;
+
+    statBarcode.innerHTML = scans
+      ? 'Barcode &nbsp;<b>' + pct(b.vin, scans) + '</b> got a VIN &nbsp;·&nbsp; ' + plural(scans, 'scan')
+        + (b.nonVin ? ' · ' + b.nonVin + ' had no VIN in the code' : '')
+        + (b.noRead ? ' · ' + b.noRead + ' found no code' : '')
+      : 'Barcode &nbsp;— no scans yet';
+
+    // "Clean" counts only reads confident enough to decode on their own. An
+    // unsure read still needed you to check it, so it isn't a win.
+    statPhoto.innerHTML = photos
+      ? 'Photo &nbsp;&nbsp;&nbsp;<b>' + pct(p.confident, photos) + '</b> read cleanly &nbsp;·&nbsp; ' + plural(photos, 'photo')
+        + (p.unsure ? ' · ' + p.unsure + ' unsure' : '')
+        + (p.none ? ' · ' + p.none + ' unreadable' : '')
+        + (p.corrected ? ' · ' + p.corrected + ' you corrected by hand' : '')
+      : 'Photo &nbsp;&nbsp;&nbsp;— no photos yet';
+
+    // The one number that answers an open question: if most successful photos
+    // are being rescued by the opposite bar, the guide on screen isn't
+    // describing the strip that actually gets captured.
+    const reads = p.confident + p.unsure;
+    statNote.textContent = (reads && p.viaFallback)
+      ? p.viaFallback + ' of ' + reads + ' photo reads (' + pct(p.viaFallback, reads) + ') only worked from the opposite bar — if that stays high, the guide is pointing the wrong way and I should fix it.'
+      : '';
+  }
+
   function getSheetUrl(){ return localStorage.getItem(SHEET_URL_KEY) || ''; }
   function setSheetUrl(v){
     if(v) localStorage.setItem(SHEET_URL_KEY, v);
@@ -977,6 +1084,11 @@
 
   const logList   = document.getElementById('logList');
   const logStatus = document.getElementById('logStatus');
+  const scanStats  = document.getElementById('scanStats');
+  const statBarcode= document.getElementById('statBarcode');
+  const statPhoto  = document.getElementById('statPhoto');
+  const statNote   = document.getElementById('statNote');
+  const resetStats = document.getElementById('resetStats');
   const retryBtn  = document.getElementById('retrySync');
 
   function renderLog(){
@@ -1199,6 +1311,13 @@
   }
 
   function stopScan(){
+    // Settle the barcode session's outcome exactly once, here rather than in
+    // handleScanResult — that runs several times a second and would count the
+    // same stubborn label over and over.
+    if(scanSessionActive){
+      scanSessionActive = false;
+      bumpStat('barcode', scanFoundVin ? 'vin' : (scanSawBarcode ? 'nonVin' : 'noRead'));
+    }
     if(scanTimer){ clearTimeout(scanTimer); scanTimer = null; }
     if(reader){ reader.reset(); reader = null; }
     if(mediaStream){ mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; video.srcObject = null; }
@@ -1221,10 +1340,11 @@
       // told apart from a decode failure, and some labels genuinely carry a
       // build or sequence number rather than the VIN — worth being able to see
       // which one you're looking at.
-      sawBarcode = true;
+      scanSawBarcode = true;
       scanNote.textContent = 'Barcode reads "' + text.slice(0, 24) + '" — that\u2019s not a VIN, try the other label';
       return false;
     }
+    scanFoundVin = true;
     vin.value = cleanVin(match[0]);
     stopScan();
     syncVin();
@@ -1236,7 +1356,10 @@
   // scan line no matter how the phone is held, so instead of relying on the
   // user to rotate the camera, each frame is also tried at every quarter-turn.
   let scanStartedAt = 0;
-  let sawBarcode = false;
+  let scanSawBarcode = false;   // decoded any barcode this session, VIN or not
+  let scanFoundVin = false;     // decoded one that actually held a VIN
+  let scanNoticeShown = false;  // the "no barcode found" prompt has replaced the framing prompt
+  let scanSessionActive = false;// a barcode session is running and still owes an outcome
   function scanLoop(){
     if(!mediaStream || !reader) return;
     if(video.videoWidth){
@@ -1253,8 +1376,8 @@
       }
       // Never having decoded anything is a different problem from decoding
       // something useless, and they need different fixes — so say which.
-      if(!sawBarcode && scanStartedAt && Date.now() - scanStartedAt > 8000){
-        sawBarcode = true; // latch, so this replaces the prompt only once
+      if(!scanSawBarcode && !scanNoticeShown && scanStartedAt && Date.now() - scanStartedAt > 8000){
+        scanNoticeShown = true; // latch, so this replaces the prompt only once
         scanNote.textContent = 'No barcode found yet — move closer, or switch to Photo';
       }
     }
@@ -1291,7 +1414,10 @@
       syncTorchBtn();
       setTimeout(syncTorchBtn, 500); // some browsers only report torch capability a moment after the track goes live
       scanStartedAt = Date.now();
-      sawBarcode = false;
+      scanSessionActive = true;
+      scanSawBarcode = false;
+      scanFoundVin = false;
+      scanNoticeShown = false;
       scanLoop();
     }catch(err){
       stopScan();
@@ -1566,6 +1692,7 @@
   }
 
   async function capturePhoto(){
+    lastPhotoRead = null; // a fresh capture supersedes any read still being judged
     if(!mediaStream) return;
 
     // Grab the frame once, then take every crop from that one canvas. Reading
@@ -1628,6 +1755,7 @@
       const crops = new Map();    // one crop per channel, cut from the same frame
       const prepared = new Map(); // rotate+preprocess once per crop+angle
       let found = null;
+      let foundMode = null;
       for(let i = 0; i < passes.length; i++){
         const pass = passes[i];
         scanNote.textContent = `Reading photo… (${i + 1}/${passes.length})`;
@@ -1646,11 +1774,16 @@
         // Keep the best-scoring read across every pass, not the first one that
         // happened to produce anything — a weak early guess shouldn't outrank a
         // clean later one just for arriving first.
-        if(res && (!found || res.score > found.score)) found = res;
+        // Remember which channel's crop the winning read came from, so the
+        // stats can show how often the chosen bar was the wrong one.
+        if(res && (!found || res.score > found.score)){ found = res; foundMode = pass.mode; }
         if(found && found.confident) break;
       }
       if(found){
-        vin.value = cleanVin(found.vin);
+        bumpStat('photo', found.confident ? 'confident' : 'unsure');
+        if(foundMode !== primary) bumpStat('photo', 'viaFallback');
+        lastPhotoRead = cleanVin(found.vin);
+        vin.value = lastPhotoRead;
         stopScan();
         syncVin();
         if(found.confident){
@@ -1665,6 +1798,7 @@
           hint.className = 'hint warn';
         }
       } else {
+        bumpStat('photo', 'none');
         scanNote.textContent = 'Could not read a VIN — retake the photo or type it in';
         captureBtn.disabled = false;
       }
@@ -1678,6 +1812,10 @@
   photoBtn.addEventListener('click', startPhoto);
   captureBtn.addEventListener('click', capturePhoto);
   torchBtn.addEventListener('click', () => setTorch(!torchOn));
+  resetStats.addEventListener('click', () => {
+    try{ localStorage.removeItem(SCAN_STATS_KEY); }catch(err){ /* private mode */ }
+    renderStats();
+  });
   guideDirBtn.addEventListener('click', () => {
     photoGuide = photoGuide === 'h' ? 'v' : 'h';
     try{ localStorage.setItem('vinGuideDir', photoGuide); }catch(err){ /* private mode */ }
@@ -1695,7 +1833,7 @@
   stopBtn.addEventListener('click', stopScan);
   window.addEventListener('pagehide', stopScan);
 
-  syncVin(); syncOdo();
+  syncVin(); syncOdo(); renderStats();
   renderLog(); flushQueue();
 })();
 </script>
