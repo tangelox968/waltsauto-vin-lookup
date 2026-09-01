@@ -386,7 +386,8 @@
   .scan-buttons{display:flex;gap:10px;flex-wrap:wrap}
   /* Photo mode can show four controls at once (Light, direction, Capture,
      Cancel) — tighten them so they stay on one row on a phone. */
-  .scanner.open .scan-buttons .btn{padding:14px 15px;font-size:12.5px}
+  .scanner.open .scan-buttons{width:100%;gap:8px}
+  .scanner.open .scan-buttons .btn{flex:1 1 0;min-width:0;padding:14px 8px;font-size:12.5px}
   #capture[hidden]{display:none}
 
   /* ---------- odometer + trim ---------- */
@@ -1461,14 +1462,14 @@
         else byVin.set(c.vin, { vin: c.vin, score: c.score });
       });
       const best = Array.from(byVin.values()).sort((a, b) => b.score - a.score)[0];
-      return { vin: best.vin, confident: best.score >= 100 };
+      return { vin: best.vin, score: best.score, confident: best.score >= 100 };
     }
     // Fallback for stickers OCR reads as one unbroken blob with no usable
     // spacing. Windows here can straddle unrelated text, so never confident.
     const flat = normalizeOcr(lines.map(l => l.text).join(''));
     for(let i = 0; i + 17 <= flat.length; i++){
       const chunk = flat.slice(i, i + 17);
-      if(plausibleVin(chunk)) return { vin: chunk, confident: false };
+      if(plausibleVin(chunk)) return { vin: chunk, score: 0, confident: false };
     }
     return null;
   }
@@ -1483,12 +1484,14 @@
   //         thinner than the text itself.
   //
   // CHANNEL_RATIO is the point of the whole thing. A 17-character VIN runs
-  // roughly 12:1, so a 7:1 channel is about 1.7x the height of a VIN that
-  // fills its length: tight enough that the sticker lines above and below fall
-  // outside the crop, loose enough to still aim at. Widen the ratio and the
-  // neighbouring text creeps back in.
+  // roughly 12:1, so a 5:1 channel is about 2.4x the height of a VIN that
+  // fills its length. Typical sticker line spacing is 1.5-2x the character
+  // height, so the lines either side still fall outside the crop, but there's
+  // enough slack that a slightly off-centre aim doesn't clip the tops and
+  // bottoms off the characters — which reads as garbage. Tighten this and
+  // clipping starts; widen it and the neighbouring text creeps back in.
   const CHANNEL_SPAN = 0.92; // fraction of the long axis the channel spans
-  const CHANNEL_RATIO = 7;   // channel long:short
+  const CHANNEL_RATIO = 5;   // channel long:short
   function guidePads(mode){
     if(mode === 'box') return [0.28, 0.18];
     const cw = viewport.clientWidth || 1;
@@ -1558,14 +1561,21 @@
     scanNote.textContent = 'Reading photo…';
     try{
       const worker = await getOcrWorker();
-      // Two sweeps, and the order matters. The VIN-only character whitelist has
-      // no space in it, so Tesseract deletes every space: on a plate holding
-      // nothing but the VIN that's harmless, but on a busy door-jamb sticker
-      // the whole label comes back as unbroken runs with the surrounding words
-      // ("THIS VEHICLE CONFORMS TO") mangled into VIN-alphabet characters that
-      // then compete with the real VIN. So read normally first — that keeps the
-      // line and word breaks extraction needs — and only fall back to the
-      // whitelist if nothing confident turned up.
+      // Two sweeps, and the order matters.
+      //
+      // The VIN-only character whitelist constrains a blurry photo to the
+      // characters a VIN can actually contain, which is a real win on a real
+      // camera capture. Its one cost is that the list has no space in it, so
+      // Tesseract deletes every space — on a busy sticker the whole label comes
+      // back as unbroken runs with the surrounding words mangled into
+      // VIN-alphabet noise. But the guide channel now crops that surrounding
+      // text away before OCR ever sees it, so inside the channel the cost
+      // doesn't apply and the win does. Whitelist first.
+      //
+      // The plain read stays as the second sweep: it's what rescues a capture
+      // where the channel was misaligned and caught a neighbouring line, since
+      // it preserves the line and word breaks extraction needs to tell them
+      // apart.
       //
       // The guide direction says which way the VIN reads, so try that first:
       // a vertical channel crop holds sideways characters that only resolve
@@ -1573,7 +1583,7 @@
       // toggle rather than being tried blind.
       const angles = guideMode === 'v' ? [90, 270, 0, 180] : [0, 180, 90, 270];
       const passes = [];
-      [false, true].forEach(useWhitelist => {
+      [true, false].forEach(useWhitelist => {
         angles.forEach(angle => passes.push({ angle, useWhitelist }));
       });
 
@@ -1591,10 +1601,11 @@
         });
         const { data } = await worker.recognize(prepared.get(pass.angle));
         const res = extractVin(data);
-        if(res){
-          if(!found) found = res;
-          if(res.confident){ found = res; break; }
-        }
+        // Keep the best-scoring read across every pass, not the first one that
+        // happened to produce anything — a weak early guess shouldn't outrank a
+        // clean later one just for arriving first.
+        if(res && (!found || res.score > found.score)) found = res;
+        if(found && found.confident) break;
       }
       if(found){
         vin.value = cleanVin(found.vin);
