@@ -344,6 +344,23 @@
     border-radius:14px;
     pointer-events:none;
   }
+  /* Photo mode swaps the box for a narrow channel. It does two jobs the box
+     couldn't: it forces you close enough that the VIN fills the frame (what
+     the old fixed line was good at), and because Photo mode reads only what's
+     inside the guide, it physically excludes the label lines above and below —
+     which is where the competing text was coming from. Two orientations,
+     because the old line only ever suited horizontally-printed VINs. */
+  .frame-guide.strip{
+    border-radius:8px;
+    border-color:rgba(34,211,238,.85);
+  }
+  .frame-guide.strip::after{
+    content:'';
+    position:absolute;
+    background:rgba(34,211,238,.4);
+  }
+  .frame-guide.strip.h::after{left:0;right:0;top:50%;height:1px}
+  .frame-guide.strip.v::after{top:0;bottom:0;left:50%;width:1px}
   .scan-bar{
     display:flex;
     align-items:center;
@@ -595,6 +612,7 @@
       <div class="scan-bar">
         <span class="scan-note" id="scan-note">Get the barcode inside the box — any direction works</span>
         <div class="scan-buttons">
+          <button class="btn btn-outline" id="guidedir" type="button" hidden>&#8596; Across</button>
           <button class="btn btn-primary" id="capture" type="button" hidden>Capture</button>
           <button class="btn btn-outline" id="stopscan" type="button">Cancel</button>
         </div>
@@ -1088,9 +1106,11 @@
   const photoBtn = document.getElementById('photo');
   const stopBtn  = document.getElementById('stopscan');
   const captureBtn = document.getElementById('capture');
+  const guideDirBtn = document.getElementById('guidedir');
   const scanner  = document.getElementById('scanner');
   const video    = document.getElementById('video');
   const viewport = document.querySelector('.viewport');
+  const frameGuide = document.querySelector('.frame-guide');
   const shotCanvas = document.getElementById('shot');
   const scanNote = document.getElementById('scan-note');
   const VIN_RE   = /[A-HJ-NPR-Z0-9]{17}/;
@@ -1146,6 +1166,7 @@
     photoBtn.textContent = 'Photo';
     captureBtn.hidden = true;
     captureBtn.disabled = false;
+    guideDirBtn.hidden = true;
   }
 
   function handleScanResult(result){
@@ -1200,6 +1221,8 @@
     document.body.style.overflow = 'hidden';
     scanBtn.textContent = 'Close';
     scanNote.textContent = 'Get the barcode inside the box — any direction works';
+    applyGuide('box');
+    guideDirBtn.hidden = true;
     captureBtn.hidden = true;
     hint.textContent = '';
     hint.className = 'hint';
@@ -1224,7 +1247,10 @@
     scanner.classList.add('open');
     document.body.style.overflow = 'hidden';
     photoBtn.textContent = 'Close';
-    scanNote.textContent = 'Get close — fill the box with the VIN, any direction works, then tap Capture';
+    scanNote.textContent = 'Fill the bar with the VIN — tap Across/Down if it reads the other way';
+    applyGuide(photoGuide);
+    syncGuideBtn();
+    guideDirBtn.hidden = false;
     captureBtn.hidden = false;
     hint.textContent = '';
     hint.className = 'hint';
@@ -1400,10 +1426,35 @@
     return null;
   }
 
-  // Maps the on-screen guide box back to raw video pixels, accounting for
-  // the crop `object-fit:cover` applies when the feed's aspect ratio doesn't
-  // match the viewport's — otherwise the box wouldn't line up with what OCR
-  // actually reads, and clutter outside it would still get scanned.
+  // Padding as [yPad, xPad] fractions of the visible frame. These drive both
+  // the on-screen guide and the crop OCR reads, so the two can't drift apart.
+  //   box — Scan mode. Purely advisory; barcodes decode off the full frame.
+  //   h/v — Photo mode channels. Narrow on one axis so the label lines either
+  //         side of the VIN fall outside the crop entirely.
+  const GUIDES = {
+    box: [0.28, 0.18],
+    h:   [0.435, 0.04], // 92% wide, 13% tall
+    v:   [0.04, 0.435]  // 13% wide, 92% tall
+  };
+  let guideMode = 'box';
+  let photoGuide = 'h';
+  try{ if(localStorage.getItem('vinGuideDir') === 'v') photoGuide = 'v'; }catch(err){ /* private mode */ }
+
+  function applyGuide(mode){
+    guideMode = mode;
+    const pad = GUIDES[mode];
+    frameGuide.style.inset = (pad[0] * 100) + '% ' + (pad[1] * 100) + '%';
+    frameGuide.className = 'frame-guide' + (mode === 'box' ? '' : ' strip ' + mode);
+  }
+
+  function syncGuideBtn(){
+    guideDirBtn.innerHTML = photoGuide === 'h' ? '&#8596; Across' : '&#8597; Down';
+  }
+
+  // Maps the on-screen guide back to raw video pixels, accounting for the crop
+  // `object-fit:cover` applies when the feed's aspect ratio doesn't match the
+  // viewport's — otherwise the guide wouldn't line up with what OCR actually
+  // reads, and clutter outside it would still get scanned.
   function guideCropRect(){
     const vw = video.videoWidth || 1280;
     const vh = video.videoHeight || 720;
@@ -1419,11 +1470,8 @@
       visW = vw; visH = vw / containerAspect;
       offX = 0; offY = (vh - visH) / 2;
     }
-    // Matches .frame-guide's inset. Deliberately tight — small VIN plates
-    // (e.g. windshield tags) need to fill most of the box for OCR to have
-    // enough pixels per character to work with; a generous box just crops
-    // in a lot of background clutter around a tiny sliver of actual text.
-    const xPad = 0.18, yPad = 0.28;
+    const pad = GUIDES[guideMode];
+    const yPad = pad[0], xPad = pad[1];
     return {
       x: offX + visW * xPad,
       y: offY + visH * yPad,
@@ -1452,10 +1500,11 @@
       // line and word breaks extraction needs — and only fall back to the
       // whitelist if nothing confident turned up.
       //
-      // Within each sweep: vertically-printed VIN text reads as sideways
-      // characters in an upright capture, so try upright first (the common
-      // case), then the two sideways holds, then upside down.
-      const angles = [0, 90, 270, 180];
+      // The guide direction says which way the VIN reads, so try that first:
+      // a vertical channel crop holds sideways characters that only resolve
+      // once rotated. The other angles stay in as a fallback for a mis-set
+      // toggle rather than being tried blind.
+      const angles = guideMode === 'v' ? [90, 270, 0, 180] : [0, 180, 90, 270];
       const passes = [];
       [false, true].forEach(useWhitelist => {
         angles.forEach(angle => passes.push({ angle, useWhitelist }));
@@ -1508,6 +1557,15 @@
   scanBtn.addEventListener('click', startScan);
   photoBtn.addEventListener('click', startPhoto);
   captureBtn.addEventListener('click', capturePhoto);
+  guideDirBtn.addEventListener('click', () => {
+    photoGuide = photoGuide === 'h' ? 'v' : 'h';
+    try{ localStorage.setItem('vinGuideDir', photoGuide); }catch(err){ /* private mode */ }
+    applyGuide(photoGuide);
+    syncGuideBtn();
+    scanNote.textContent = photoGuide === 'h'
+      ? 'Fill the bar with the VIN reading left to right'
+      : 'Fill the bar with the VIN reading top to bottom';
+  });
   stopBtn.addEventListener('click', stopScan);
   window.addEventListener('pagehide', stopScan);
 
