@@ -384,6 +384,9 @@
   }
   .scanner.open .scan-note{color:var(--text)}
   .scan-buttons{display:flex;gap:10px;flex-wrap:wrap}
+  /* Photo mode can show four controls at once (Light, direction, Capture,
+     Cancel) — tighten them so they stay on one row on a phone. */
+  .scanner.open .scan-buttons .btn{padding:14px 15px;font-size:12.5px}
   #capture[hidden]{display:none}
 
   /* ---------- odometer + trim ---------- */
@@ -612,6 +615,7 @@
       <div class="scan-bar">
         <span class="scan-note" id="scan-note">Get the barcode inside the box — any direction works</span>
         <div class="scan-buttons">
+          <button class="btn btn-outline" id="torch" type="button" hidden>Light</button>
           <button class="btn btn-outline" id="guidedir" type="button" hidden>&#8596; Across</button>
           <button class="btn btn-primary" id="capture" type="button" hidden>Capture</button>
           <button class="btn btn-outline" id="stopscan" type="button">Cancel</button>
@@ -1107,6 +1111,7 @@
   const stopBtn  = document.getElementById('stopscan');
   const captureBtn = document.getElementById('capture');
   const guideDirBtn = document.getElementById('guidedir');
+  const torchBtn = document.getElementById('torch');
   const scanner  = document.getElementById('scanner');
   const video    = document.getElementById('video');
   const viewport = document.querySelector('.viewport');
@@ -1156,6 +1161,42 @@
     return rdr.decodeBitmap(new ZXing.BinaryBitmap(binarizer));
   }
 
+  // A phone won't hand its flashlight to the torch app while the browser holds
+  // the camera, which leaves a door jamb unreadable after dark. So drive the
+  // torch from here instead. It's a capability of the live video track, and
+  // only some browsers expose it (Android Chrome does, iOS Safari doesn't), so
+  // the button stays hidden unless the track actually reports it.
+  let torchOn = false;
+  function torchTrack(){
+    if(!mediaStream) return null;
+    const track = mediaStream.getVideoTracks()[0];
+    if(!track || typeof track.getCapabilities !== 'function') return null;
+    try{
+      const caps = track.getCapabilities() || {};
+      return caps.torch ? track : null;
+    }catch(err){ return null; } // some browsers throw rather than report nothing
+  }
+
+  function syncTorchBtn(){
+    torchBtn.hidden = !torchTrack();
+    torchBtn.textContent = torchOn ? 'Light on' : 'Light';
+    torchBtn.classList.toggle('btn-primary', torchOn);
+    torchBtn.classList.toggle('btn-outline', !torchOn);
+  }
+
+  async function setTorch(on){
+    const track = torchTrack();
+    if(!track) return;
+    try{
+      await track.applyConstraints({ advanced: [{ torch: on }] });
+      torchOn = on;
+    }catch(err){
+      torchOn = false;
+      scanNote.textContent = 'This phone won\u2019t let the browser control the light';
+    }
+    syncTorchBtn();
+  }
+
   function stopScan(){
     if(scanTimer){ clearTimeout(scanTimer); scanTimer = null; }
     if(reader){ reader.reset(); reader = null; }
@@ -1167,6 +1208,8 @@
     captureBtn.hidden = true;
     captureBtn.disabled = false;
     guideDirBtn.hidden = true;
+    torchBtn.hidden = true;
+    torchOn = false; // the track is stopped, so the light is already out
   }
 
   function handleScanResult(result){
@@ -1231,6 +1274,8 @@
       mediaStream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
       video.srcObject = mediaStream;
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
+      syncTorchBtn();
+      setTimeout(syncTorchBtn, 500); // some browsers only report torch capability a moment after the track goes live
       scanLoop();
     }catch(err){
       stopScan();
@@ -1258,6 +1303,8 @@
       mediaStream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
       video.srcObject = mediaStream;
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
+      syncTorchBtn();
+      setTimeout(syncTorchBtn, 500); // some browsers only report torch capability a moment after the track goes live
     }catch(err){
       stopScan();
       hint.textContent = (err && err.name === 'NotAllowedError')
@@ -1577,6 +1624,7 @@
   scanBtn.addEventListener('click', startScan);
   photoBtn.addEventListener('click', startPhoto);
   captureBtn.addEventListener('click', capturePhoto);
+  torchBtn.addEventListener('click', () => setTorch(!torchOn));
   guideDirBtn.addEventListener('click', () => {
     photoGuide = photoGuide === 'h' ? 'v' : 'h';
     try{ localStorage.setItem('vinGuideDir', photoGuide); }catch(err){ /* private mode */ }
