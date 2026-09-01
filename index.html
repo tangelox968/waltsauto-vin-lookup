@@ -1426,23 +1426,43 @@
     return null;
   }
 
-  // Padding as [yPad, xPad] fractions of the visible frame. These drive both
-  // the on-screen guide and the crop OCR reads, so the two can't drift apart.
+  // Returns [yPad, xPad] as fractions of the visible frame. Drives both the
+  // on-screen guide and the crop OCR reads, so the two can't drift apart.
+  //
   //   box — Scan mode. Purely advisory; barcodes decode off the full frame.
-  //   h/v — Photo mode channels. Narrow on one axis so the label lines either
-  //         side of the VIN fall outside the crop entirely.
-  const GUIDES = {
-    box: [0.28, 0.18],
-    h:   [0.435, 0.04], // 92% wide, 13% tall
-    v:   [0.04, 0.435]  // 13% wide, 92% tall
-  };
+  //   h/v — Photo mode channels, sized by aspect ratio rather than by a fixed
+  //         percentage of height. A fixed percentage looks right in portrait
+  //         and collapses in landscape, where 13% of a short viewport is
+  //         thinner than the text itself.
+  //
+  // CHANNEL_RATIO is the point of the whole thing. A 17-character VIN runs
+  // roughly 12:1, so a 7:1 channel is about 1.7x the height of a VIN that
+  // fills its length: tight enough that the sticker lines above and below fall
+  // outside the crop, loose enough to still aim at. Widen the ratio and the
+  // neighbouring text creeps back in.
+  const CHANNEL_SPAN = 0.92; // fraction of the long axis the channel spans
+  const CHANNEL_RATIO = 7;   // channel long:short
+  function guidePads(mode){
+    if(mode === 'box') return [0.28, 0.18];
+    const cw = viewport.clientWidth || 1;
+    const ch = viewport.clientHeight || 1;
+    if(mode === 'h'){
+      const wPx = cw * CHANNEL_SPAN;
+      const hPx = Math.min(ch * 0.6, wPx / CHANNEL_RATIO);
+      return [(1 - hPx / ch) / 2, (1 - CHANNEL_SPAN) / 2];
+    }
+    const hPx = ch * CHANNEL_SPAN;
+    const wPx = Math.min(cw * 0.6, hPx / CHANNEL_RATIO);
+    return [(1 - CHANNEL_SPAN) / 2, (1 - wPx / cw) / 2];
+  }
+
   let guideMode = 'box';
   let photoGuide = 'h';
   try{ if(localStorage.getItem('vinGuideDir') === 'v') photoGuide = 'v'; }catch(err){ /* private mode */ }
 
   function applyGuide(mode){
     guideMode = mode;
-    const pad = GUIDES[mode];
+    const pad = guidePads(mode);
     frameGuide.style.inset = (pad[0] * 100) + '% ' + (pad[1] * 100) + '%';
     frameGuide.className = 'frame-guide' + (mode === 'box' ? '' : ' strip ' + mode);
   }
@@ -1470,7 +1490,7 @@
       visW = vw; visH = vw / containerAspect;
       offX = 0; offY = (vh - visH) / 2;
     }
-    const pad = GUIDES[guideMode];
+    const pad = guidePads(guideMode);
     const yPad = pad[0], xPad = pad[1];
     return {
       x: offX + visW * xPad,
@@ -1565,6 +1585,11 @@
     scanNote.textContent = photoGuide === 'h'
       ? 'Fill the bar with the VIN reading left to right'
       : 'Fill the bar with the VIN reading top to bottom';
+  });
+  // Channel geometry is derived from the viewport's live dimensions, so it has
+  // to be recomputed if the phone is turned while the scanner is open.
+  window.addEventListener('resize', () => {
+    if(scanner.classList.contains('open')) applyGuide(guideMode);
   });
   stopBtn.addEventListener('click', stopScan);
   window.addEventListener('pagehide', stopScan);
