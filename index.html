@@ -1255,9 +1255,8 @@
     return tesseractLoading;
   }
 
-  // Reused across captures so retakes don't re-download/re-init the OCR engine,
-  // and locked to the actual VIN alphabet (no I/O/Q) so it's forced to pick the
-  // nearest valid character instead of guessing freely across the whole sticker.
+  // Reused across captures so retakes don't re-download/re-init the OCR engine.
+  // The character whitelist is set per pass, not here — see capturePhoto.
   let ocrWorker = null;
   let ocrWorkerLoading = null;
   function getOcrWorker(){
@@ -1266,7 +1265,6 @@
     ocrWorkerLoading = loadTesseract().then(async () => {
       const worker = await Tesseract.createWorker('eng');
       await worker.setParameters({
-        tessedit_char_whitelist: 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789',
         tessedit_pageseg_mode: '6' // assume a single uniform block of text
       });
       ocrWorker = worker;
@@ -1445,19 +1443,37 @@
     scanNote.textContent = 'Reading photo…';
     try{
       const worker = await getOcrWorker();
-      // Vertically-printed VIN text (common on door jambs) reads as sideways
-      // characters in an upright capture — try the upright orientation first
-      // since it's the common case, then the two sideways holds, then upside
-      // down last. Stops early on a confident read; a shaky one is kept but the
-      // remaining angles still get a chance to beat it.
+      // Two sweeps, and the order matters. The VIN-only character whitelist has
+      // no space in it, so Tesseract deletes every space: on a plate holding
+      // nothing but the VIN that's harmless, but on a busy door-jamb sticker
+      // the whole label comes back as unbroken runs with the surrounding words
+      // ("THIS VEHICLE CONFORMS TO") mangled into VIN-alphabet characters that
+      // then compete with the real VIN. So read normally first — that keeps the
+      // line and word breaks extraction needs — and only fall back to the
+      // whitelist if nothing confident turned up.
+      //
+      // Within each sweep: vertically-printed VIN text reads as sideways
+      // characters in an upright capture, so try upright first (the common
+      // case), then the two sideways holds, then upside down.
       const angles = [0, 90, 270, 180];
+      const passes = [];
+      [false, true].forEach(useWhitelist => {
+        angles.forEach(angle => passes.push({ angle, useWhitelist }));
+      });
+
+      const prepared = new Map(); // rotate+preprocess once per angle, reused across sweeps
       let found = null;
-      for(let i = 0; i < angles.length; i++){
-        const angle = angles[i];
-        if(angles.length > 1) scanNote.textContent = `Reading photo… (${i + 1}/${angles.length})`;
-        const rotated = angle === 0 ? shotCanvas : rotateCanvas(shotCanvas, angle);
-        const ocrCanvas = preprocessForOcr(rotated);
-        const { data } = await worker.recognize(ocrCanvas);
+      for(let i = 0; i < passes.length; i++){
+        const pass = passes[i];
+        scanNote.textContent = `Reading photo… (${i + 1}/${passes.length})`;
+        if(!prepared.has(pass.angle)){
+          const rotated = pass.angle === 0 ? shotCanvas : rotateCanvas(shotCanvas, pass.angle);
+          prepared.set(pass.angle, preprocessForOcr(rotated));
+        }
+        await worker.setParameters({
+          tessedit_char_whitelist: pass.useWhitelist ? 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789' : ''
+        });
+        const { data } = await worker.recognize(prepared.get(pass.angle));
         const res = extractVin(data);
         if(res){
           if(!found) found = res;
