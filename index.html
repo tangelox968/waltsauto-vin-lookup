@@ -1217,7 +1217,12 @@
     const text = result.getText().toUpperCase().replace(/[^A-Z0-9]/g,'');
     const match = text.match(VIN_RE);
     if(!match){
-      scanNote.textContent = 'Read a barcode, but no VIN in it — try the other label';
+      // Show what the barcode actually said. "No VIN in it" on its own can't be
+      // told apart from a decode failure, and some labels genuinely carry a
+      // build or sequence number rather than the VIN — worth being able to see
+      // which one you're looking at.
+      sawBarcode = true;
+      scanNote.textContent = 'Barcode reads "' + text.slice(0, 24) + '" — that\u2019s not a VIN, try the other label';
       return false;
     }
     vin.value = cleanVin(match[0]);
@@ -1230,6 +1235,8 @@
   // Vertically-printed door-jamb barcodes never line up with a horizontal
   // scan line no matter how the phone is held, so instead of relying on the
   // user to rotate the camera, each frame is also tried at every quarter-turn.
+  let scanStartedAt = 0;
+  let sawBarcode = false;
   function scanLoop(){
     if(!mediaStream || !reader) return;
     if(video.videoWidth){
@@ -1244,8 +1251,15 @@
           break;
         }catch(err){ /* nothing found at this angle — try the next */ }
       }
+      // Never having decoded anything is a different problem from decoding
+      // something useless, and they need different fixes — so say which.
+      if(!sawBarcode && scanStartedAt && Date.now() - scanStartedAt > 8000){
+        sawBarcode = true; // latch, so this replaces the prompt only once
+        scanNote.textContent = 'No barcode found yet — move closer, or switch to Photo';
+      }
     }
     scanTimer = setTimeout(scanLoop, 300);
+  }
   }
 
   async function startScan(){
@@ -1277,6 +1291,8 @@
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
       syncTorchBtn();
       setTimeout(syncTorchBtn, 500); // some browsers only report torch capability a moment after the track goes live
+      scanStartedAt = Date.now();
+      sawBarcode = false;
       scanLoop();
     }catch(err){
       stopScan();
