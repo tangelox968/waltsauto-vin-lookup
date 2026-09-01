@@ -1540,7 +1540,7 @@
   // `object-fit:cover` applies when the feed's aspect ratio doesn't match the
   // viewport's — otherwise the guide wouldn't line up with what OCR actually
   // reads, and clutter outside it would still get scanned.
-  function guideCropRect(){
+  function guideCropRect(mode){
     const vw = video.videoWidth || 1280;
     const vh = video.videoHeight || 720;
     const cw = viewport.clientWidth || vw;
@@ -1555,7 +1555,7 @@
       visW = vw; visH = vw / containerAspect;
       offX = 0; offY = (vh - visH) / 2;
     }
-    const pad = guidePads(guideMode);
+    const pad = guidePads(mode || guideMode);
     const yPad = pad[0], xPad = pad[1];
     return {
       x: offX + visW * xPad,
@@ -1567,10 +1567,22 @@
 
   async function capturePhoto(){
     if(!mediaStream) return;
-    const rect = guideCropRect();
-    shotCanvas.width = rect.w;
-    shotCanvas.height = rect.h;
-    shotCanvas.getContext('2d').drawImage(video, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+
+    // Grab the frame once, then take every crop from that one canvas. Reading
+    // the video again between crops would sample a different moment — and with
+    // a hand-held phone, a different framing.
+    shotCanvas.width = video.videoWidth;
+    shotCanvas.height = video.videoHeight;
+    shotCanvas.getContext('2d').drawImage(video, 0, 0);
+
+    function channelCrop(mode){
+      const rect = guideCropRect(mode);
+      const c = document.createElement('canvas');
+      c.width = rect.w;
+      c.height = rect.h;
+      c.getContext('2d').drawImage(shotCanvas, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+      return c;
+    }
 
     captureBtn.disabled = true;
     scanNote.textContent = 'Reading photo…';
@@ -1592,29 +1604,44 @@
       // it preserves the line and word breaks extraction needs to tell them
       // apart.
       //
-      // The guide direction says which way the VIN reads, so try that first:
-      // a vertical channel crop holds sideways characters that only resolve
-      // once rotated. The other angles stay in as a fallback for a mis-set
-      // toggle rather than being tried blind.
-      const angles = guideMode === 'v' ? [90, 270, 0, 180] : [0, 180, 90, 270];
+      // Each channel has its own natural reading angles: text filling a wide
+      // channel sits upright (0/180), text filling a tall one sits sideways
+      // (90/270). Trying a channel's crop at the other channel's angles was
+      // mostly wasted work, because text that reads sideways inside a wide
+      // channel wouldn't have fitted the channel in the first place.
+      //
+      // Spending those passes on the *other channel's crop* is worth far more.
+      // It covers a toggle set the wrong way, and it covers the phone being
+      // held turned relative to the label — cases where the guide on screen
+      // doesn't match the strip of the world that actually holds the VIN. Only
+      // runs when the chosen channel finds nothing, so a correct setting costs
+      // nothing.
+      const CHANNEL_ANGLES = { h: [0, 180], v: [90, 270] };
+      const primary = guideMode === 'v' ? 'v' : 'h';
       const passes = [];
-      [true, false].forEach(useWhitelist => {
-        angles.forEach(angle => passes.push({ angle, useWhitelist }));
+      [primary, primary === 'h' ? 'v' : 'h'].forEach(mode => {
+        [true, false].forEach(useWhitelist => {
+          CHANNEL_ANGLES[mode].forEach(angle => passes.push({ mode, angle, useWhitelist }));
+        });
       });
 
-      const prepared = new Map(); // rotate+preprocess once per angle, reused across sweeps
+      const crops = new Map();    // one crop per channel, cut from the same frame
+      const prepared = new Map(); // rotate+preprocess once per crop+angle
       let found = null;
       for(let i = 0; i < passes.length; i++){
         const pass = passes[i];
         scanNote.textContent = `Reading photo… (${i + 1}/${passes.length})`;
-        if(!prepared.has(pass.angle)){
-          const rotated = pass.angle === 0 ? shotCanvas : rotateCanvas(shotCanvas, pass.angle);
-          prepared.set(pass.angle, preprocessForOcr(rotated));
+        const key = pass.mode + ':' + pass.angle;
+        if(!prepared.has(key)){
+          if(!crops.has(pass.mode)) crops.set(pass.mode, channelCrop(pass.mode));
+          const base = crops.get(pass.mode);
+          const rotated = pass.angle === 0 ? base : rotateCanvas(base, pass.angle);
+          prepared.set(key, preprocessForOcr(rotated));
         }
         await worker.setParameters({
           tessedit_char_whitelist: pass.useWhitelist ? 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789' : ''
         });
-        const { data } = await worker.recognize(prepared.get(pass.angle));
+        const { data } = await worker.recognize(prepared.get(key));
         const res = extractVin(data);
         // Keep the best-scoring read across every pass, not the first one that
         // happened to produce anything — a weak early guess shouldn't outrank a
