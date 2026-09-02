@@ -1018,7 +1018,7 @@
   const SCAN_STATS_KEY = 'waltsautoScanStats';
   function blankStats(){
     return {
-      photo:   { confident:0, unsure:0, none:0, corrected:0, viaFallback:0 },
+      photo:   { confident:0, unsure:0, none:0, corrected:0, viaFallback:0, repaired:0 },
       barcode: { vin:0, nonVin:0, noRead:0 }
     };
   }
@@ -1043,7 +1043,7 @@
     const s = loadStats();
     const b = s.barcode, p = s.photo;
     const scans = b.vin + b.nonVin + b.noRead;
-    const photos = p.confident + p.unsure + p.none;
+    const photos = p.confident + p.unsure + p.none + p.repaired;
     if(!scans && !photos){ scanStats.hidden = true; return; }
     scanStats.hidden = false;
 
@@ -1058,6 +1058,7 @@
     statPhoto.innerHTML = photos
       ? 'Photo &nbsp;&nbsp;&nbsp;<b>' + pct(p.confident, photos) + '</b> read cleanly &nbsp;·&nbsp; ' + plural(photos, 'photo')
         + (p.unsure ? ' · ' + p.unsure + ' unsure' : '')
+        + (p.repaired ? ' · ' + p.repaired + ' rebuilt from a near-miss' : '')
         + (p.none ? ' · ' + p.none + ' unreadable' : '')
         + (p.corrected ? ' · ' + p.corrected + ' you corrected by hand' : '')
       : 'Photo &nbsp;&nbsp;&nbsp;— no photos yet';
@@ -1065,22 +1066,35 @@
     // The one number that answers an open question: if most successful photos
     // are being rescued by the opposite bar, the guide on screen isn't
     // describing the strip that actually gets captured.
-    const reads = p.confident + p.unsure;
+    const reads = p.confident + p.unsure + p.repaired;
     statNote.textContent = (reads && p.viaFallback)
       ? p.viaFallback + ' of ' + reads + ' photo reads (' + pct(p.viaFallback, reads) + ') only worked from the opposite bar — if that stays high, the guide is pointing the wrong way and I should fix it.'
       : '';
   }
 
-  function getSheetUrl(){ return localStorage.getItem(SHEET_URL_KEY) || ''; }
+  // Every other localStorage access here is wrapped, and these three need to be
+  // too: in private mode, and inside some in-app browsers, touching storage
+  // throws rather than returning null. These run during start-up, so an
+  // unguarded throw takes the whole script down and the app comes up dead —
+  // no scan button, no decode, nothing.
+  function getSheetUrl(){
+    try{ return localStorage.getItem(SHEET_URL_KEY) || ''; }
+    catch(e){ return ''; }
+  }
   function setSheetUrl(v){
-    if(v) localStorage.setItem(SHEET_URL_KEY, v);
-    else localStorage.removeItem(SHEET_URL_KEY);
+    try{
+      if(v) localStorage.setItem(SHEET_URL_KEY, v);
+      else localStorage.removeItem(SHEET_URL_KEY);
+    }catch(e){ /* private mode — setting holds for this session only */ }
   }
   function loadQueue(){
     try{ return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); }
     catch(e){ return []; }
   }
-  function saveQueue(q){ localStorage.setItem(LOG_KEY, JSON.stringify(q.slice(0,200))); }
+  function saveQueue(q){
+    try{ localStorage.setItem(LOG_KEY, JSON.stringify(q.slice(0,200))); }
+    catch(e){ /* private mode — the queue lives in memory until the tab closes */ }
+  }
 
   const logList   = document.getElementById('logList');
   const logStatus = document.getElementById('logStatus');
@@ -1252,6 +1266,22 @@
   // fall back to their max supported size if the device camera can't do this.
   const CAMERA_CONSTRAINTS = {
     video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }
+  };
+  // Photo mode reads still frames, so it can afford more pixels than the
+  // barcode loop, which has to decode four rotations every 300ms and would
+  // start dropping frames at this size. Character strokes on a door-jamb
+  // sticker are only a pixel or two wide at 1080p; at 2560 they survive the
+  // grayscale/threshold stage instead of dissolving into it. `ideal` means a
+  // camera that can't do it just gives its best, rather than failing.
+  const PHOTO_CONSTRAINTS = {
+    video:{
+      facingMode:{ ideal:'environment' },
+      width:{ ideal:2560 }, height:{ ideal:1440 },
+      // Autofocus is the single biggest lever on OCR quality and some tracks
+      // come up locked. Unsupported names are ignored, so this is free.
+      focusMode:{ ideal:'continuous' },
+      advanced:[{ focusMode:'continuous' }]
+    }
   };
 
   function rotateCanvas(src, degrees){
@@ -1442,11 +1472,15 @@
     hint.textContent = '';
     hint.className = 'hint';
     try{
-      mediaStream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
+      mediaStream = await navigator.mediaDevices.getUserMedia(PHOTO_CONSTRAINTS);
       video.srcObject = mediaStream;
       try{ await video.play(); }catch(playErr){ /* some browsers auto-play once srcObject is set; ignore if already playing */ }
       syncTorchBtn();
       setTimeout(syncTorchBtn, 500); // some browsers only report torch capability a moment after the track goes live
+      // Warm the OCR engine while the user is still aiming. It's a ~2MB
+      // download and a worker spin-up; paying for it here rather than after
+      // the shutter takes several seconds out of the wait.
+      getOcrWorker().catch(() => { /* surfaced later, when a capture actually needs it */ });
     }catch(err){
       stopScan();
       hint.textContent = (err && err.name === 'NotAllowedError')
@@ -1478,7 +1512,28 @@
     if(ocrWorker) return Promise.resolve(ocrWorker);
     if(ocrWorkerLoading) return ocrWorkerLoading;
     ocrWorkerLoading = loadTesseract().then(async () => {
-      const worker = await Tesseract.createWorker('eng');
+      // Tesseract's English language model is a liability here. A VIN is a
+      // random 17-character string, and the dictionaries ("dawg" files) exist
+      // to pull ambiguous shapes towards real English words — so a clean
+      // 1HGCM... gets nudged towards something wordlike. These have to be set
+      // at init, not by setParameters afterwards, because the dictionaries are
+      // loaded when the engine initialises.
+      const noDict = {
+        load_system_dawg: '0',
+        load_freq_dawg: '0',
+        load_punc_dawg: '0',
+        load_number_dawg: '0',
+        load_unambig_dawg: '0',
+        load_bigram_dawg: '0'
+      };
+      let worker;
+      try{
+        worker = await Tesseract.createWorker('eng', 1, {}, noDict);
+      }catch(err){
+        // Older/newer builds may not take the 4-argument form; a worker with
+        // the dictionaries loaded still reads VINs, just less well.
+        worker = await Tesseract.createWorker('eng');
+      }
       await worker.setParameters({
         tessedit_pageseg_mode: '6' // assume a single uniform block of text
       });
@@ -1492,17 +1547,31 @@
   // one glare spot on a metal VIN plate doesn't wash out the whole stretch) +
   // 2x upscale. Raw camera photos of stamped/embossed VIN text read as
   // near-garbage without this — this is the main fix for that.
-  function preprocessForOcr(canvas){
+  //
+  // Two variants, because they fail on opposite things:
+  //
+  //   'stretch' — one contrast stretch over the whole crop. Best on an evenly
+  //               lit sticker; the 2% clip stops a single glare spot on a
+  //               metal plate from eating the whole range.
+  //   'local'   — Sauvola adaptive threshold: every pixel is judged against
+  //               the mean and spread of its own neighbourhood instead of the
+  //               whole image. This is the one that survives a door jamb lit
+  //               half by sun and half by shadow, or a torch hot-spot in the
+  //               middle of the strip — cases where a global stretch crushes
+  //               one end of the VIN to solid black or blows it to white.
+  //
+  // Neither dominates, so the pass ladder tries both.
+  function preprocessForOcr(canvas, variant){
     const scale = 2;
     const out = document.createElement('canvas');
-    out.width = Math.round(canvas.width * scale);
-    out.height = Math.round(canvas.height * scale);
+    const w = out.width = Math.round(canvas.width * scale);
+    const h = out.height = Math.round(canvas.height * scale);
     const octx = out.getContext('2d');
-    octx.drawImage(canvas, 0, 0, out.width, out.height);
+    octx.drawImage(canvas, 0, 0, w, h);
 
-    const imgData = octx.getImageData(0, 0, out.width, out.height);
+    const imgData = octx.getImageData(0, 0, w, h);
     const d = imgData.data;
-    const n = out.width * out.height;
+    const n = w * h;
     const gray = new Uint8ClampedArray(n);
     const hist = new Uint32Array(256);
     for(let i = 0, p = 0; i < d.length; i += 4, p++){
@@ -1510,6 +1579,13 @@
       gray[p] = g;
       hist[g]++;
     }
+
+    if(variant === 'local'){
+      sauvolaInto(gray, w, h, d);
+      octx.putImageData(imgData, 0, 0);
+      return out;
+    }
+
     const clip = n * 0.02;
     let lo = 0, acc = 0;
     while(lo < 255 && (acc += hist[lo]) < clip) lo++;
@@ -1524,6 +1600,76 @@
     return out;
   }
 
+  // Sauvola threshold over integral images, so the window mean and variance
+  // are O(1) per pixel regardless of window size. Window is tied to the crop's
+  // short axis: the channel is about 2.4 character-heights tall, so a third of
+  // it lands near one character height, which is the scale the method wants.
+  function sauvolaInto(gray, w, h, rgba){
+    const win = Math.max(15, Math.round(Math.min(w, h) / 3) | 1);
+    const r = win >> 1;
+    const iw = w + 1;
+    const sum = new Float64Array(iw * (h + 1));
+    const sqs = new Float64Array(iw * (h + 1));
+    for(let y = 0; y < h; y++){
+      let rowSum = 0, rowSq = 0;
+      for(let x = 0; x < w; x++){
+        const g = gray[y * w + x];
+        rowSum += g; rowSq += g * g;
+        sum[(y + 1) * iw + x + 1] = sum[y * iw + x + 1] + rowSum;
+        sqs[(y + 1) * iw + x + 1] = sqs[y * iw + x + 1] + rowSq;
+      }
+    }
+    const K = 0.2, R = 128;
+    for(let y = 0; y < h; y++){
+      const y0 = Math.max(0, y - r), y1 = Math.min(h - 1, y + r);
+      for(let x = 0; x < w; x++){
+        const x0 = Math.max(0, x - r), x1 = Math.min(w - 1, x + r);
+        const area = (x1 - x0 + 1) * (y1 - y0 + 1);
+        const a = y0 * iw + x0, b = y0 * iw + x1 + 1, c = (y1 + 1) * iw + x0, e = (y1 + 1) * iw + x1 + 1;
+        const s = sum[e] - sum[b] - sum[c] + sum[a];
+        const q = sqs[e] - sqs[b] - sqs[c] + sqs[a];
+        const mean = s / area;
+        const sd = Math.sqrt(Math.max(0, q / area - mean * mean));
+        const t = mean * (1 + K * (sd / R - 1));
+        const p = (y * w + x) * 4;
+        const v = gray[y * w + x] > t ? 255 : 0;
+        rgba[p] = rgba[p + 1] = rgba[p + 2] = v;
+      }
+    }
+  }
+
+  // Variance of the Laplacian — the standard focus metric. A hand-held phone
+  // at a door jamb produces frames that differ enormously in sharpness over a
+  // few hundred milliseconds, and OCR on a soft frame is wasted work, so the
+  // capture takes a burst and this decides which one to read. Measured on a
+  // downsample: the ranking is what matters, not the absolute number, and full
+  // resolution would cost more than the OCR pass it saves.
+  const SHARP_W = 480;
+  function sharpness(canvas){
+    const w = Math.min(SHARP_W, canvas.width);
+    const h = Math.max(1, Math.round(canvas.height * w / canvas.width));
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(canvas, 0, 0, w, h);
+    const d = ctx.getImageData(0, 0, w, h).data;
+    const g = new Float32Array(w * h);
+    for(let i = 0, p = 0; i < d.length; i += 4, p++){
+      g[p] = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+    }
+    let sum = 0, sumSq = 0, count = 0;
+    for(let y = 1; y < h - 1; y++){
+      for(let x = 1; x < w - 1; x++){
+        const p = y * w + x;
+        const lap = 4 * g[p] - g[p - 1] - g[p + 1] - g[p - w] - g[p + w];
+        sum += lap; sumSq += lap * lap; count++;
+      }
+    }
+    if(!count) return 0;
+    const mean = sum / count;
+    return sumSq / count - mean * mean;
+  }
+
   // Position 1 (region) and position 10 (model year) are fixed by the VIN
   // standard, so they're hard filters, not scoring hints. Check digit alone is
   // a weak gate — any random 17-char string passes it about 1 time in 11, which
@@ -1534,6 +1680,96 @@
     if(v[0] === '0') return false;                    // no region code uses 0
     if(YEAR_CODES.indexOf(v[9]) === -1) return false; // not a valid year code
     return checkDigitValid(v);
+  }
+
+  // Which characters actually get mistaken for which, in this alphabet, on a
+  // stamped or printed VIN. Deliberately not symmetric-by-default: it's a map
+  // from what OCR *reported* to what the character might really have been.
+  // I, O and Q aren't here as keys because normalizeOcr has already folded
+  // them into 1 and 0 before anything gets this far.
+  const OCR_CONFUSIONS = {
+    '0':'DU', '1':'7LJT', '2':'Z', '3':'89', '4':'AH', '5':'S',
+    '6':'G8', '7':'1TZ', '8':'B63', '9':'3PG',
+    'A':'4R', 'B':'8ER', 'C':'GL', 'D':'0P', 'E':'FB', 'F':'EP',
+    'G':'6C9', 'H':'4MN', 'J':'1LT', 'K':'X', 'L':'1JC', 'M':'HN',
+    'N':'MH', 'P':'9FRD', 'R':'8BP', 'S':'5', 'T':'17J', 'U':'0V',
+    'V':'YUW', 'W':'V', 'X':'KY', 'Y':'VX', 'Z':'27'
+  };
+
+  // A 17-character run that fails validation is usually one bad character away
+  // from the real VIN — that's the whole reason a check digit exists. So walk
+  // the substitutions OCR is actually likely to have made and collect every
+  // one that lands on a valid VIN.
+  //
+  // The check digit alone is far too weak to pick a winner here: about one in
+  // eleven strings passes it, so a 17-character run with three alternates per
+  // position throws up four or five valid-looking repairs by pure chance. This
+  // function therefore does not choose. It returns the shortlist, ordered by
+  // how few characters had to change, and the caller arbitrates against NHTSA
+  // — a real vehicle record is the only tiebreak strong enough to trust.
+  // Ranking is not cosmetic here. A typical 17-character run yields four or
+  // five repairs that pass the check digit, and only a bounded number of them
+  // can be put to NHTSA, so anything that ranks badly is the same as not being
+  // found. Order by number of substitutions first, then by how likely each
+  // substitution is — the alternates in OCR_CONFUSIONS are written
+  // most-plausible-first, so a character's index in its own alternate string
+  // is a usable cost. Sorting by position instead, which is what an unranked
+  // insertion order amounts to, drops the correct VIN off the end of the list
+  // about two times in five.
+  const MAX_REPAIRS = 24;
+  function repairCandidates(run){
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(run)) return [];
+    const seen = new Set([run]);
+    const out = [];
+    const tryOne = (s, edits, cost) => {
+      if(seen.has(s)) return;
+      seen.add(s);
+      if(plausibleVin(s)) out.push({ vin: s, edits: edits, cost: cost });
+    };
+    for(let i = 0; i < 17; i++){
+      const alts = OCR_CONFUSIONS[run[i]] || '';
+      for(let a = 0; a < alts.length; a++){
+        tryOne(run.slice(0, i) + alts[a] + run.slice(i + 1), 1, a);
+      }
+    }
+    // Two bad characters is common on a scuffed or half-shadowed sticker, but
+    // the search space is ~2500 strings and the check digit filters barely one
+    // in eleven of them, so only go there when a single substitution found
+    // nothing at all.
+    if(!out.length){
+      for(let i = 0; i < 17; i++){
+        const ai = OCR_CONFUSIONS[run[i]] || '';
+        for(let x = 0; x < ai.length; x++){
+          const one = run.slice(0, i) + ai[x] + run.slice(i + 1);
+          for(let j = i + 1; j < 17; j++){
+            const aj = OCR_CONFUSIONS[one[j]] || '';
+            for(let y = 0; y < aj.length; y++){
+              tryOne(one.slice(0, j) + aj[y] + one.slice(j + 1), 2, x + y);
+            }
+          }
+        }
+      }
+    }
+    return out
+      .sort((a, b) => (a.edits - b.edits) || (a.cost - b.cost))
+      .slice(0, MAX_REPAIRS);
+  }
+
+  // Different OCR passes make different mistakes in different places, which is
+  // exactly the condition under which voting works. Given several 17-character
+  // reads of what should be the same VIN, take the most common character at
+  // each position. A run that two passes agree on beats a run only one saw.
+  function voteRuns(runs){
+    if(runs.length < 2) return null;
+    let out = '';
+    for(let i = 0; i < 17; i++){
+      const tally = new Map();
+      runs.forEach(r => tally.set(r[i], (tally.get(r[i]) || 0) + 1));
+      let best = null, bestN = 0;
+      tally.forEach((n, ch) => { if(n > bestN){ bestN = n; best = ch; } });
+      out += best;
+    }
+    return out;
   }
 
   // Tesseract's line structure lives in different places across versions, and
@@ -1564,10 +1800,17 @@
   // run of surrounding text (GVWR, tire sizes, paint codes).
   function vinCandidates(lines){
     const out = [];
+    const runs = []; // every isolated 17-char token, valid or not — repair fodder
     lines.forEach(line => {
       const raw = (line.text || '').toUpperCase();
       const labeled = /V[1IL]N/.test(raw); // the char whitelist has no I, so "VIN" reads as V1N/VLN
       const tokens = raw.split(/\s+/).filter(Boolean);
+      tokens.forEach(t => {
+        const norm = normalizeOcr(t);
+        // Exactly 17 on its own is the shape of a VIN and nothing else on a
+        // door-jamb sticker. Worth keeping even when it doesn't validate.
+        if(norm.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/.test(norm)) runs.push({ run: norm, labeled });
+      });
       for(let i = 0; i < tokens.length; i++){
         // Join at most 3 adjacent tokens on the same line — OCR often splits one
         // VIN across a couple of gaps — but never across a line break.
@@ -1586,14 +1829,16 @@
         }
       }
     });
-    return out;
+    return { cands: out, runs: runs };
   }
 
   // Returns { vin, confident } or null. A non-confident read still gets shown,
   // but the caller must not auto-submit it.
   function extractVin(data){
     const lines = ocrLines(data);
-    const cands = vinCandidates(lines);
+    const found = vinCandidates(lines);
+    const cands = found.cands;
+    const runs = found.runs;
     if(cands.length){
       const byVin = new Map();
       cands.forEach(c => {
@@ -1603,16 +1848,16 @@
         else byVin.set(c.vin, { vin: c.vin, score: c.score });
       });
       const best = Array.from(byVin.values()).sort((a, b) => b.score - a.score)[0];
-      return { vin: best.vin, score: best.score, confident: best.score >= 100 };
+      return { vin: best.vin, score: best.score, confident: best.score >= 100, runs: runs };
     }
     // Fallback for stickers OCR reads as one unbroken blob with no usable
     // spacing. Windows here can straddle unrelated text, so never confident.
     const flat = normalizeOcr(lines.map(l => l.text).join(''));
     for(let i = 0; i + 17 <= flat.length; i++){
       const chunk = flat.slice(i, i + 17);
-      if(plausibleVin(chunk)) return { vin: chunk, score: 0, confident: false };
+      if(plausibleVin(chunk)) return { vin: chunk, score: 0, confident: false, runs: runs };
     }
-    return null;
+    return { vin: null, score: -1, confident: false, runs: runs };
   }
 
   // Returns [yPad, xPad] as fractions of the visible frame. Drives both the
@@ -1691,95 +1936,236 @@
     };
   }
 
+  // Ask NHTSA which of several candidate VINs is a real vehicle. This is the
+  // arbitration step that makes character repair safe. The check digit is far
+  // too weak to pick between repairs on its own — roughly one string in eleven
+  // passes it — but a VIN that decodes to an actual make and model year with
+  // no error code is a fact about the world, not a coincidence. Only an
+  // outright winner counts: if two candidates both decode, the read stays
+  // unresolved rather than guessing between two real vehicles.
+  async function vpicArbitrate(vins){
+    // Sixteen small GETs against a public API, and only on a capture that
+    // failed outright — the shortlist is ranked, so the cap is about not
+    // hammering NHTSA rather than about the candidates being worthless.
+    const list = vins.slice(0, 16);
+    if(!list.length) return null;
+    const settled = await Promise.all(list.map(async v => {
+      try{
+        const res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + v + '?format=json');
+        if(!res.ok) return null;
+        const d = await res.json();
+        const r = d.Results && d.Results[0];
+        if(!r || !r.Make || !r.ModelYear) return null;
+        const codes = String(r.ErrorCode || '').split(',').map(s => s.trim()).filter(Boolean);
+        if(codes.length && !codes.every(c => c === '0')) return null;
+        return { vin: v, rec: r };
+      }catch(err){ return null; } // offline, or NHTSA down — no arbitration, no harm
+    }));
+    const ok = settled.filter(Boolean);
+    return ok.length === 1 ? ok[0] : null;
+  }
+
+  // A hand-held phone at arm's length in a door jamb produces frames that vary
+  // wildly in sharpness over a few hundred milliseconds — breathing, heartbeat,
+  // the autofocus still hunting when the shutter is tapped. Taking one frame
+  // means taking whichever of those happened to land under the finger. Take
+  // several and keep the sharpest instead; it costs about a third of a second
+  // and it is the difference between readable and not on a lot of captures.
+  const BURST_FRAMES = 5;
+  function grabBurst(n){
+    return new Promise(resolve => {
+      const shots = [];
+      const take = () => {
+        const c = document.createElement('canvas');
+        c.width = video.videoWidth || 1280;
+        c.height = video.videoHeight || 720;
+        c.getContext('2d').drawImage(video, 0, 0);
+        shots.push(c);
+        if(shots.length >= n) resolve(shots);
+        else requestAnimationFrame(() => setTimeout(take, 55));
+      };
+      take();
+    });
+  }
+
+  function cropRectFrom(src, rect){
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(rect.w));
+    c.height = Math.max(1, Math.round(rect.h));
+    c.getContext('2d').drawImage(src, rect.x, rect.y, rect.w, rect.h, 0, 0, c.width, c.height);
+    return c;
+  }
+
+  // Below this, the sharpest frame of the burst was still soft enough that the
+  // capture was never going to read. Used only to word the failure message —
+  // "hold still" is actionable, "could not read a VIN" isn't.
+  const BLUR_FLOOR = 60;
+
   async function capturePhoto(){
     lastPhotoRead = null; // a fresh capture supersedes any read still being judged
     if(!mediaStream) return;
 
-    // Grab the frame once, then take every crop from that one canvas. Reading
-    // the video again between crops would sample a different moment — and with
-    // a hand-held phone, a different framing.
-    shotCanvas.width = video.videoWidth;
-    shotCanvas.height = video.videoHeight;
-    shotCanvas.getContext('2d').drawImage(video, 0, 0);
+    captureBtn.disabled = true;
+    scanNote.textContent = 'Hold still…';
+
+    const primary = guideMode === 'v' ? 'v' : 'h';
+    const burst = await grabBurst(BURST_FRAMES);
+    const focusRect = guideCropRect(primary);
+    let shot = burst[0], shotSharp = -1;
+    burst.forEach(f => {
+      const s = sharpness(cropRectFrom(f, focusRect));
+      if(s > shotSharp){ shotSharp = s; shot = f; }
+    });
+
+    // Every crop comes off the one chosen frame, so the channels can't
+    // disagree about what the camera was pointed at.
+    shotCanvas.width = shot.width;
+    shotCanvas.height = shot.height;
+    shotCanvas.getContext('2d').drawImage(shot, 0, 0);
 
     function channelCrop(mode){
-      const rect = guideCropRect(mode);
-      const c = document.createElement('canvas');
-      c.width = rect.w;
-      c.height = rect.h;
-      c.getContext('2d').drawImage(shotCanvas, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-      return c;
+      return cropRectFrom(shotCanvas, guideCropRect(mode));
     }
 
-    captureBtn.disabled = true;
     scanNote.textContent = 'Reading photo…';
     try{
       const worker = await getOcrWorker();
-      // Two sweeps, and the order matters.
+      // A ladder of OCR passes, ordered so the first one answers the ordinary
+      // case and the rest are only paid for when it doesn't.
       //
-      // The VIN-only character whitelist constrains a blurry photo to the
+      // Three things vary between passes, each for its own reason:
+      //
+      // Whitelist. The VIN-only character list constrains a blurry photo to the
       // characters a VIN can actually contain, which is a real win on a real
       // camera capture. Its one cost is that the list has no space in it, so
       // Tesseract deletes every space — on a busy sticker the whole label comes
       // back as unbroken runs with the surrounding words mangled into
-      // VIN-alphabet noise. But the guide channel now crops that surrounding
-      // text away before OCR ever sees it, so inside the channel the cost
-      // doesn't apply and the win does. Whitelist first.
+      // VIN-alphabet noise. But the guide channel crops that surrounding text
+      // away before OCR ever sees it, so inside the channel the cost doesn't
+      // apply and the win does. Whitelist first; the plain read stays as a
+      // later pass, because it's what rescues a capture where the channel was
+      // misaligned and caught a neighbouring line — it preserves the line and
+      // word breaks extraction needs to tell them apart.
       //
-      // The plain read stays as the second sweep: it's what rescues a capture
-      // where the channel was misaligned and caught a neighbouring line, since
-      // it preserves the line and word breaks extraction needs to tell them
-      // apart.
-      //
-      // Each channel has its own natural reading angles: text filling a wide
-      // channel sits upright (0/180), text filling a tall one sits sideways
-      // (90/270). Trying a channel's crop at the other channel's angles was
-      // mostly wasted work, because text that reads sideways inside a wide
+      // Angle. Each channel has its own natural reading angles: text filling a
+      // wide channel sits upright (0/180), text filling a tall one sits
+      // sideways (90/270). Trying a channel's crop at the other channel's
+      // angles is wasted work, because text that reads sideways inside a wide
       // channel wouldn't have fitted the channel in the first place.
       //
-      // Spending those passes on the *other channel's crop* is worth far more.
-      // It covers a toggle set the wrong way, and it covers the phone being
-      // held turned relative to the label — cases where the guide on screen
-      // doesn't match the strip of the world that actually holds the VIN. Only
-      // runs when the chosen channel finds nothing, so a correct setting costs
-      // nothing.
+      // Channel. Spending passes on the *other channel's crop* is worth far
+      // more than extra angles. It covers a toggle set the wrong way, and the
+      // phone being held turned relative to the label — cases where the guide
+      // on screen doesn't match the strip of the world that holds the VIN.
+      //
+      // The ladder is ordered so the ordinary case — a well-aimed shot of a
+      // clean sticker — is answered by the very first pass and the rest never
+      // run. Each tier below it buys back a different kind of bad capture:
+      //
+      //   1. chosen channel, global stretch, VIN alphabet, single-line mode
+      //   2. chosen channel, local threshold — uneven light, glare, shadow
+      //   3. chosen channel, no whitelist, block mode — rescues a crop that
+      //      caught a neighbouring sticker line and needs its word breaks
+      //   4-5. the other channel's crop, same idea — covers the toggle set the
+      //      wrong way, or the phone held turned relative to the label
+      //
+      // Page segmentation matters more than it looks. Mode 7 tells Tesseract
+      // the image is exactly one line of text, which is precisely true of a
+      // channel crop and stops it inventing a column layout out of the gaps
+      // between VIN characters. Mode 6 is right only for the rescue passes,
+      // where the crop really does hold more than one line.
       const CHANNEL_ANGLES = { h: [0, 180], v: [90, 270] };
-      const primary = guideMode === 'v' ? 'v' : 'h';
+      const other = primary === 'h' ? 'v' : 'h';
       const passes = [];
-      [primary, primary === 'h' ? 'v' : 'h'].forEach(mode => {
-        [true, false].forEach(useWhitelist => {
-          CHANNEL_ANGLES[mode].forEach(angle => passes.push({ mode, angle, useWhitelist }));
-        });
-      });
+      const tier = (mode, variant, useWhitelist, psm) => {
+        CHANNEL_ANGLES[mode].forEach(angle => passes.push({ mode, angle, variant, useWhitelist, psm }));
+      };
+      tier(primary, 'stretch', true,  '7');
+      tier(primary, 'local',   true,  '7');
+      tier(primary, 'stretch', false, '6');
+      tier(other,   'stretch', true,  '7');
+      tier(other,   'stretch', false, '6');
 
       const crops = new Map();    // one crop per channel, cut from the same frame
-      const prepared = new Map(); // rotate+preprocess once per crop+angle
+      const prepared = new Map(); // rotate+preprocess once per crop+angle+variant
+      const runPool = [];         // every isolated 17-char read, across all passes
       let found = null;
       let foundMode = null;
       for(let i = 0; i < passes.length; i++){
         const pass = passes[i];
         scanNote.textContent = `Reading photo… (${i + 1}/${passes.length})`;
-        const key = pass.mode + ':' + pass.angle;
+        const key = pass.mode + ':' + pass.angle + ':' + pass.variant;
         if(!prepared.has(key)){
           if(!crops.has(pass.mode)) crops.set(pass.mode, channelCrop(pass.mode));
           const base = crops.get(pass.mode);
           const rotated = pass.angle === 0 ? base : rotateCanvas(base, pass.angle);
-          prepared.set(key, preprocessForOcr(rotated));
+          prepared.set(key, preprocessForOcr(rotated, pass.variant));
         }
         await worker.setParameters({
+          tessedit_pageseg_mode: pass.psm,
           tessedit_char_whitelist: pass.useWhitelist ? 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789' : ''
         });
         const { data } = await worker.recognize(prepared.get(key));
         const res = extractVin(data);
+        res.runs.forEach(r => { if(runPool.indexOf(r.run) === -1) runPool.push(r.run); });
         // Keep the best-scoring read across every pass, not the first one that
         // happened to produce anything — a weak early guess shouldn't outrank a
         // clean later one just for arriving first.
         // Remember which channel's crop the winning read came from, so the
         // stats can show how often the chosen bar was the wrong one.
-        if(res && (!found || res.score > found.score)){ found = res; foundMode = pass.mode; }
+        if(res.vin && (!found || res.score > found.score)){ found = res; foundMode = pass.mode; }
         if(found && found.confident) break;
       }
-      if(found){
+
+      // Nothing validated outright. Before giving up, treat the 17-character
+      // runs the passes did produce as near-misses rather than garbage: vote
+      // across them where they disagree, expand each into the VINs it could be
+      // one or two OCR-plausible characters away from, and let NHTSA say which
+      // one is a real vehicle. This is where a capture that used to come back
+      // "could not read a VIN" turns into a VIN worth confirming.
+      let verified = null;
+      if(!found || !found.confident){
+        // Ordered by how much the candidate deserves one of the arbitration
+        // slots: a string several passes voted on, then runs that already
+        // validate, then repairs of those. Passes on the chosen channel run
+        // first, so their runs and repairs naturally sort ahead of the other
+        // channel's.
+        const CAP = 16;
+        const shortlist = [];
+        const add = v => { if(v && shortlist.length < CAP && shortlist.indexOf(v) === -1) shortlist.push(v); };
+        const voted = voteRuns(runPool);
+        if(voted && plausibleVin(voted)) add(voted);
+        runPool.forEach(r => { if(plausibleVin(r)) add(r); });
+        if(found && found.vin) add(found.vin);
+        if(voted) repairCandidates(voted).forEach(c => add(c.vin));
+        runPool.forEach(r => repairCandidates(r).forEach(c => add(c.vin)));
+        if(shortlist.length){
+          scanNote.textContent = 'Checking possible reads…';
+          verified = await vpicArbitrate(shortlist);
+        }
+      }
+      if(verified){
+        // Whether this rebuilt the read or merely confirmed it changes what
+        // there is to say about it, and which counter it belongs in.
+        const rebuilt = !found || verified.vin !== found.vin;
+        bumpStat('photo', rebuilt ? 'repaired' : 'unsure');
+        if(!rebuilt && foundMode !== primary) bumpStat('photo', 'viaFallback');
+        lastPhotoRead = cleanVin(verified.vin);
+        vin.value = lastPhotoRead;
+        stopScan();
+        syncVin();
+        // Deliberately not auto-decoded, even though NHTSA has just confirmed
+        // this VIN belongs to a real vehicle. Characters were reconstructed,
+        // and a real vehicle existing at this VIN is not the same thing as it
+        // being the vehicle in front of you.
+        const who = [verified.rec.ModelYear, verified.rec.Make, verified.rec.Model].filter(Boolean).join(' ');
+        hint.textContent = (rebuilt ? 'Filled in a hard-to-read character' : 'Read from photo')
+          + (who ? ' — NHTSA reads this as a ' + who : '')
+          + '. Check it against the sticker, then tap Decode.';
+        hint.className = 'hint warn';
+        return;
+      }
+      if(found && found.vin){
         bumpStat('photo', found.confident ? 'confident' : 'unsure');
         if(foundMode !== primary) bumpStat('photo', 'viaFallback');
         lastPhotoRead = cleanVin(found.vin);
@@ -1799,7 +2185,14 @@
         }
       } else {
         bumpStat('photo', 'none');
-        scanNote.textContent = 'Could not read a VIN — retake the photo or type it in';
+        // Say why, when the frame itself tells us why. A soft capture and a
+        // sharp capture of an unreadable sticker need different responses from
+        // whoever is standing at the car.
+        scanNote.textContent = shotSharp < BLUR_FLOOR
+          ? 'Too blurry — hold the phone steady, or back off a few inches so it can focus'
+          : (runPool.length
+              ? 'Read the characters but none of them checked out — retake, or type it in'
+              : 'Could not read a VIN — fill the bar with the VIN, add Light if it is dim');
         captureBtn.disabled = false;
       }
     }catch(err){
