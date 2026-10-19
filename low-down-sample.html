@@ -17,6 +17,7 @@
   header{background:linear-gradient(160deg,var(--navy),var(--deep));color:#fff;padding:18px 16px 22px}
   .brand{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:960px;margin:0 auto}
   .brand b{font:400 22px Anton,Impact,sans-serif;letter-spacing:.02em}
+  .brand a.home{color:#fff}
   .brand a{color:var(--yellow);font-weight:700;text-decoration:none;font-size:14px;white-space:nowrap}
   .hero{max-width:960px;margin:18px auto 0}
   .hero .kicker{color:var(--sky);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
@@ -139,7 +140,7 @@
 </section>
 <div id="app" hidden>
 <header>
-  <div class="brand"><b>WALT'S AUTO SALES</b><a href="tel:325-658-9223">📞 325-658-9223</a></div>
+  <div class="brand"><a href="#" class="home"><b>WALT'S AUTO SALES</b></a><a href="tel:325-658-9223">📞 325-658-9223</a></div>
   <div class="hero">
     <div class="kicker">San Angelo &middot; Drive today</div>
     <h1 id="h1">Low <em>Down</em></h1>
@@ -286,8 +287,7 @@
       document.title = "Walt's Auto Sales — 31st Anniversary";
     }
 
-    function show(){
-      const h = location.hash.slice(1);
+    function show(h){
       $('intro').hidden = h !== '';
       $('app').hidden = h === '';
       if (h === '') return intro();
@@ -313,8 +313,21 @@
         </article>`).join('') || '<div class="empty">No cars in this group right now — check back soon.</div>';
       document.title = `${money(amt)} Down Cars — Walt's Auto Sales`;
     }
-    window.addEventListener('hashchange', () => { show(); scrollTo(0, 0); });
-    show();
+    // Navigate inside the page without changing the address bar, so a copied link always
+    // opens on the anniversary page. A #900-style link still works as a direct entry point.
+    const clean = location.pathname + location.search;
+    const start = location.hash.slice(1);
+    history.replaceState({ view: start }, '', clean);
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      e.preventDefault();
+      const view = a.getAttribute('href').slice(1);
+      history.pushState({ view }, '', clean);
+      show(view); scrollTo(0, 0);
+    });
+    window.addEventListener('popstate', e => { show(e.state?.view ?? ''); scrollTo(0, 0); });
+    show(start);
   }
   load();
 })();
