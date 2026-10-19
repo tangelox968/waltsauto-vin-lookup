@@ -9,63 +9,70 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:wght@700&family=Cinzel:wght@600&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --blue:#1a4fc9; --navy:#0a1f5c; --deep:#06143d; --yellow:#ffcc29; --sky:#a9c1ff;
-         --bg:#f3f6fc; --card:#fff; --text:#0d1630; --soft:#5a6787; --line:#dfe6f3; }
+  /* Whole page follows the black-and-gold anniversary look of the opening page. */
+  :root{ --bg:#0a0907; --card:#15120d; --card-2:#1d1810; --text:#f4ecd6; --soft:#b9ad8c; --line:#3a2f1a;
+         --gold:#e2b54a; --goldhi:#fff4c8; --golddk:#8a5d14; --ink:#1a1004;
+         --goldgrad:linear-gradient(180deg,#fff4c8,#e2b54a 55%,#b9852a); }
   *{box-sizing:border-box} [hidden]{display:none!important}
   html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,sans-serif}
   .sample{background:#b91c1c;color:#fff;text-align:center;font:700 12px Inter,sans-serif;padding:6px 16px;letter-spacing:.04em}
-  header{background:linear-gradient(160deg,var(--navy),var(--deep));color:#fff;padding:18px 16px 22px}
+  header{background:#050505 radial-gradient(ellipse at 50% 0%,rgba(226,181,74,.25),transparent 65%);color:#fff;
+         padding:18px 16px 22px;border-bottom:1px solid var(--line)}
   .brand{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:960px;margin:0 auto}
-  .brand b{font:400 22px Anton,Impact,sans-serif;letter-spacing:.02em}
-  .brand a.home{color:#fff}
-  .brand a{color:var(--yellow);font-weight:700;text-decoration:none;font-size:14px;white-space:nowrap}
+  .brand b{font:600 15px Cinzel,Georgia,serif;letter-spacing:.24em;color:var(--gold)}
+  .brand a{color:var(--goldhi);font-weight:700;text-decoration:none;font-size:14px;white-space:nowrap}
   .hero{max-width:960px;margin:18px auto 0}
-  .hero .kicker{color:var(--sky);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
-  .hero h1{margin:4px 0 4px;font:400 54px/1 Anton,Impact,sans-serif;text-transform:uppercase}
-  .hero h1 em{font-style:normal;color:var(--yellow)}
-  .hero p{margin:0;color:#d5def5}
-  nav{position:sticky;top:0;z-index:2;background:var(--deep);border-top:1px solid #1b2f6b;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .hero .kicker{color:var(--soft);font:600 12px Cinzel,Georgia,serif;letter-spacing:.18em;text-transform:uppercase}
+  .hero h1{margin:6px 0 6px;font:600 clamp(36px,10vw,54px)/1.05 Cinzel,Georgia,serif;text-transform:uppercase;letter-spacing:.02em}
+  .hero h1 em{font:700 1.15em 'Bodoni Moda',Didot,Georgia,serif;font-style:normal;
+              background:linear-gradient(175deg,#fff4c8 10%,#e2b54a 45%,#8a5d14 70%,#f3d58a 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin:0;color:#e9dcb5}
+  .hero p b{color:var(--gold)}
+  nav{position:sticky;top:0;z-index:2;background:#050505;border-bottom:1px solid var(--line);overflow-x:auto;-webkit-overflow-scrolling:touch}
   nav .in{display:flex;gap:8px;padding:10px 16px;max-width:960px;margin:0 auto;width:max-content;min-width:100%}
-  nav a{flex:none;color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid #2c4590}
-  nav a small{color:var(--sky);font-weight:600;margin-left:4px}
-  nav a.on{background:var(--yellow);border-color:var(--yellow);color:var(--deep)}
-  nav a.on small{color:var(--navy)}
+  nav a{flex:none;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid var(--golddk)}
+  nav a small{color:var(--gold);font-weight:600;margin-left:4px}
+  nav a.on{background:var(--goldgrad);border-color:var(--gold);color:var(--ink)}
+  nav a.on small{color:var(--ink)}
   main{max-width:960px;margin:0 auto;padding:16px}
   .count{color:var(--soft);font-weight:600;margin:0 0 12px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-  .car{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(10,31,92,.06);display:flex;flex-direction:column}
-  .ph{position:relative;aspect-ratio:4/3;background:#dfe6f3}
+  .car{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.5);display:flex;flex-direction:column}
+  .ph{position:relative;aspect-ratio:4/3;background:var(--card-2);border-bottom:2px solid var(--gold)}
   .ph img{width:100%;height:100%;object-fit:cover;display:block}
-  .badge{position:absolute;left:10px;top:10px;background:var(--yellow);color:var(--deep);font:400 22px/1 Anton,Impact,sans-serif;
-         padding:7px 10px 6px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25);text-transform:uppercase}
-  .badge small{font:800 11px Inter,sans-serif;display:block;letter-spacing:.06em;margin-top:2px}
+  .badge{position:absolute;left:10px;top:10px;background:var(--goldgrad);color:var(--ink);font:700 22px/1 'Bodoni Moda',Didot,Georgia,serif;
+         padding:7px 10px 6px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.5);text-align:center}
+  .badge small{font:600 10px Cinzel,Georgia,serif;display:block;letter-spacing:.14em;margin-top:3px}
   .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
-  .body h3{margin:0;font-size:17px;line-height:1.25}
+  .body h3{margin:0;font-size:17px;line-height:1.25;color:#fff}
   .meta{color:var(--soft);font-size:13.5px}
   .btns{display:flex;gap:8px;margin-top:auto;padding-top:10px}
   .btns a{flex:1;text-align:center;text-decoration:none;font-weight:700;font-size:14px;padding:11px 8px;border-radius:10px}
-  .btns .see{background:var(--blue);color:#fff}
-  .btns .call{background:#eaf0fd;color:var(--navy)}
-  .cta{background:var(--navy);color:#fff;border-radius:14px;padding:18px;margin:22px 0 8px;text-align:center}
-  .cta h2{margin:0 0 4px;font:400 28px Anton,Impact,sans-serif;text-transform:uppercase}
-  .cta a{display:inline-block;margin-top:10px;background:var(--yellow);color:var(--deep);font-weight:800;text-decoration:none;padding:12px 22px;border-radius:10px}
+  .btns .see{background:var(--goldgrad);color:var(--ink)}
+  .btns .call{background:transparent;color:var(--gold);border:1px solid var(--golddk)}
+  .cta{background:#050505 radial-gradient(ellipse at 50% 0%,rgba(226,181,74,.22),transparent 70%);border:1px solid var(--golddk);
+       color:#fff;border-radius:14px;padding:20px 18px;margin:22px 0 8px;text-align:center}
+  .cta h2{margin:0 0 6px;font:600 24px Cinzel,Georgia,serif;text-transform:uppercase;letter-spacing:.04em;color:var(--gold)}
+  .cta a{display:inline-block;margin-top:12px;background:var(--goldgrad);color:var(--ink);font:700 16px Cinzel,Georgia,serif;letter-spacing:.08em;
+         text-decoration:none;padding:12px 26px;border-radius:999px}
   .fine{color:var(--soft);font-size:12px;margin-top:14px}
   .empty{color:var(--soft);padding:30px 0;text-align:center}
   .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
   .tile{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:16px;
-        overflow:hidden;box-shadow:0 2px 10px rgba(10,31,92,.06)}
-  .tile .top{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .tile .amt{font:400 40px/1 Anton,Impact,sans-serif}
-  .tile .amt span{color:var(--yellow)}
-  .tile .amt small{font:800 13px Inter,sans-serif;letter-spacing:.08em;margin-left:6px;color:var(--sky)}
-  .tile .n{background:var(--yellow);color:var(--deep);font-weight:800;font-size:13px;padding:6px 10px;border-radius:999px;white-space:nowrap}
+        overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.5)}
+  .tile .top{background:#050505 radial-gradient(ellipse at 20% 0%,rgba(226,181,74,.28),transparent 70%);border-bottom:2px solid var(--gold);
+             color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .tile .amt{font:700 40px/1 'Bodoni Moda',Didot,Georgia,serif}
+  .tile .amt span{background:linear-gradient(175deg,#fff4c8 10%,#e2b54a 45%,#8a5d14 70%,#f3d58a 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tile .amt small{font:600 13px Cinzel,Georgia,serif;letter-spacing:.14em;margin-left:6px;color:var(--text)}
+  .tile .n{background:var(--goldgrad);color:var(--ink);font-weight:800;font-size:13px;padding:6px 10px;border-radius:999px;white-space:nowrap}
   .tile .pics{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line)}
-  .tile .pics img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#dfe6f3}
+  .tile .pics img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--card-2)}
   .tile .models{padding:10px 16px 0;color:var(--soft);font-size:13.5px}
-  .tile .go{display:block;margin:10px 16px 16px;text-align:center;background:var(--blue);color:#fff;font-weight:700;padding:11px;border-radius:10px}
+  .tile .go{display:block;margin:10px 16px 16px;text-align:center;background:var(--goldgrad);color:var(--ink);font-weight:700;padding:11px;border-radius:10px}
   .how{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 4px;text-align:center}
   .how div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;font-size:13px;color:var(--soft)}
-  .how b{display:block;font:400 26px Anton,Impact,sans-serif;color:var(--blue)}
+  .how b{display:block;font:700 28px 'Bodoni Moda',Didot,Georgia,serif;color:var(--gold)}
 
   /* Opening page: black-and-gold anniversary look, matching Walt's 30th anniversary reel */
   .intro{--ink:#050505;--goldhi:#fff4c8;--gold:#e2b54a;--golddk:#8a5d14;
@@ -102,10 +109,10 @@
   .pdn{font:600 clamp(26px,8vw,36px)/1 Cinzel,Georgia,serif;letter-spacing:.06em}
   .oac{margin-top:12px;font:600 14px Inter,sans-serif;color:#e9dcb5}
   .oac b{color:var(--gold)}
-  .go{margin-top:18px;display:block;width:100%;max-width:400px;text-decoration:none;color:#1a1004;
+  .intro .go{margin-top:18px;display:block;width:100%;max-width:400px;text-decoration:none;color:#1a1004;
       font:700 20px Cinzel,Georgia,serif;letter-spacing:.08em;padding:16px;border-radius:999px;
       background:linear-gradient(180deg,var(--goldhi),var(--gold) 55%,#b9852a);box-shadow:0 6px 22px rgba(226,181,74,.35)}
-  .go:active{transform:translateY(2px)}
+  .intro .go:active{transform:translateY(2px)}
   .contact{margin-top:20px;font:600 14px/1.7 Cinzel,Georgia,serif;letter-spacing:.14em;color:#f1e6c6}
   .contact small{font-size:11px;letter-spacing:.2em}
   .disc{margin:18px 0 0;font:400 11.5px/1.5 Inter,sans-serif;color:#b9ad8c;max-width:52ch;text-align:left}
