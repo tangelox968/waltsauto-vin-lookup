@@ -1,0 +1,33 @@
+name: Update website inventory
+
+on:
+  schedule:
+    - cron: "7 * * * *"   # hourly
+  workflow_dispatch:       # "Run workflow" button for an on-demand refresh
+
+permissions:
+  contents: write
+
+concurrency: inventory
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/fetch_inventory.py inventory.json
+      - name: Commit if the car list changed
+        run: |
+          # Ignore the "checked" timestamp so we only commit real inventory changes.
+          if git diff --quiet -I '"checked"' -- inventory.json; then
+            echo "No inventory change"
+            exit 0
+          fi
+          git config user.name "inventory-bot"
+          git config user.email "inventory-bot@users.noreply.github.com"
+          git add inventory.json
+          git commit -m "Update inventory from waltsautosales.net"
+          git push
