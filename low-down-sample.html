@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Low Down Payment Cars &mdash; Walt's Auto Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:wght@700&family=Cinzel:wght@600&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --blue:#1a4fc9; --navy:#0a1f5c; --deep:#06143d; --yellow:#ffcc29; --sky:#a9c1ff;
+         --bg:#f3f6fc; --card:#fff; --text:#0d1630; --soft:#5a6787; --line:#dfe6f3; }
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,sans-serif}
+  .sample{background:#b91c1c;color:#fff;text-align:center;font:700 12px Inter,sans-serif;padding:6px 16px;letter-spacing:.04em}
+  header{background:linear-gradient(160deg,var(--navy),var(--deep));color:#fff;padding:18px 16px 22px}
+  .brand{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:960px;margin:0 auto}
+  .brand b{font:400 22px Anton,Impact,sans-serif;letter-spacing:.02em}
+  .brand a{color:var(--yellow);font-weight:700;text-decoration:none;font-size:14px;white-space:nowrap}
+  .hero{max-width:960px;margin:18px auto 0}
+  .hero .kicker{color:var(--sky);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  .hero h1{margin:4px 0 4px;font:400 54px/1 Anton,Impact,sans-serif;text-transform:uppercase}
+  .hero h1 em{font-style:normal;color:var(--yellow)}
+  .hero p{margin:0;color:#d5def5}
+  nav{position:sticky;top:0;z-index:2;background:var(--deep);border-top:1px solid #1b2f6b;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  nav .in{display:flex;gap:8px;padding:10px 16px;max-width:960px;margin:0 auto;width:max-content;min-width:100%}
+  nav a{flex:none;color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid #2c4590}
+  nav a small{color:var(--sky);font-weight:600;margin-left:4px}
+  nav a.on{background:var(--yellow);border-color:var(--yellow);color:var(--deep)}
+  nav a.on small{color:var(--navy)}
+  main{max-width:960px;margin:0 auto;padding:16px}
+  .count{color:var(--soft);font-weight:600;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .car{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(10,31,92,.06);display:flex;flex-direction:column}
+  .ph{position:relative;aspect-ratio:4/3;background:#dfe6f3}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .badge{position:absolute;left:10px;top:10px;background:var(--yellow);color:var(--deep);font:400 22px/1 Anton,Impact,sans-serif;
+         padding:7px 10px 6px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25);text-transform:uppercase}
+  .badge small{font:800 11px Inter,sans-serif;display:block;letter-spacing:.06em;margin-top:2px}
+  .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .body h3{margin:0;font-size:17px;line-height:1.25}
+  .meta{color:var(--soft);font-size:13.5px}
+  .btns{display:flex;gap:8px;margin-top:auto;padding-top:10px}
+  .btns a{flex:1;text-align:center;text-decoration:none;font-weight:700;font-size:14px;padding:11px 8px;border-radius:10px}
+  .btns .see{background:var(--blue);color:#fff}
+  .btns .call{background:#eaf0fd;color:var(--navy)}
+  .cta{background:var(--navy);color:#fff;border-radius:14px;padding:18px;margin:22px 0 8px;text-align:center}
+  .cta h2{margin:0 0 4px;font:400 28px Anton,Impact,sans-serif;text-transform:uppercase}
+  .cta a{display:inline-block;margin-top:10px;background:var(--yellow);color:var(--deep);font-weight:800;text-decoration:none;padding:12px 22px;border-radius:10px}
+  .fine{color:var(--soft);font-size:12px;margin-top:14px}
+  .empty{color:var(--soft);padding:30px 0;text-align:center}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .tile{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:16px;
+        overflow:hidden;box-shadow:0 2px 10px rgba(10,31,92,.06)}
+  .tile .top{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .tile .amt{font:400 40px/1 Anton,Impact,sans-serif}
+  .tile .amt span{color:var(--yellow)}
+  .tile .amt small{font:800 13px Inter,sans-serif;letter-spacing:.08em;margin-left:6px;color:var(--sky)}
+  .tile .n{background:var(--yellow);color:var(--deep);font-weight:800;font-size:13px;padding:6px 10px;border-radius:999px;white-space:nowrap}
+  .tile .pics{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line)}
+  .tile .pics img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#dfe6f3}
+  .tile .models{padding:10px 16px 0;color:var(--soft);font-size:13.5px}
+  .tile .go{display:block;margin:10px 16px 16px;text-align:center;background:var(--blue);color:#fff;font-weight:700;padding:11px;border-radius:10px}
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 4px;text-align:center}
+  .how div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;font-size:13px;color:var(--soft)}
+  .how b{display:block;font:400 26px Anton,Impact,sans-serif;color:var(--blue)}
+
+  /* Opening page: black-and-gold anniversary look, matching Walt's 30th anniversary reel */
+  .intro{--ink:#050505;--goldhi:#fff4c8;--gold:#e2b54a;--golddk:#8a5d14;
+         background:var(--ink);color:#fff;min-height:100%;overflow:hidden;position:relative;
+         background-image:radial-gradient(circle at 50% 30%,rgba(226,181,74,.22),transparent 55%),
+           radial-gradient(1.5px 1.5px at 12% 18%,#ffe9a8 50%,transparent 51%),radial-gradient(1px 1px at 82% 12%,#fff 50%,transparent 51%),
+           radial-gradient(1.5px 1.5px at 70% 40%,#ffe9a8 50%,transparent 51%),radial-gradient(1px 1px at 25% 55%,#fff 50%,transparent 51%),
+           radial-gradient(1.5px 1.5px at 90% 70%,#ffe9a8 50%,transparent 51%),radial-gradient(1px 1px at 8% 82%,#fff 50%,transparent 51%),
+           radial-gradient(1px 1px at 55% 88%,#ffe9a8 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 8%,#fff 50%,transparent 51%)}
+  .rays{position:absolute;inset:-20% -40% auto;height:90%;pointer-events:none;opacity:.5;
+        background:repeating-conic-gradient(from 0deg at 50% 45%,rgba(226,181,74,.16) 0 4deg,transparent 4deg 14deg);
+        -webkit-mask:radial-gradient(circle at 50% 45%,#000 10%,transparent 60%);mask:radial-gradient(circle at 50% 45%,#000 10%,transparent 60%)}
+  .gold{background:linear-gradient(175deg,var(--goldhi) 10%,var(--gold) 45%,var(--golddk) 70%,#f3d58a 92%);
+        -webkit-background-clip:text;background-clip:text;color:transparent}
+  .intro .in{position:relative;max-width:560px;margin:0 auto;padding:26px 16px 34px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .ibrand{font:600 13px Cinzel,Georgia,serif;letter-spacing:.32em;color:var(--gold)}
+  .num{font:700 clamp(120px,38vw,190px)/.9 'Bodoni Moda',Didot,Georgia,serif;margin-top:6px;letter-spacing:-.02em}
+  .num sup{font-size:.28em;font-style:italic;vertical-align:top;position:relative;top:.25em;margin-left:2px}
+  .script{font:400 clamp(58px,19vw,92px)/.8 'Great Vibes',cursive;color:#f6dc8a;margin-top:-.32em;
+          text-shadow:0 2px 0 var(--golddk),0 0 18px rgba(226,181,74,.45);transform:rotate(-4deg)}
+  .lld{font:600 clamp(28px,9vw,40px)/1 Cinzel,Georgia,serif;letter-spacing:.06em;margin-top:18px;padding-bottom:6px;border-bottom:2px solid #fff}
+  .sale{font:600 clamp(18px,5.6vw,24px)/1 Cinzel,Georgia,serif;letter-spacing:.14em;margin-top:8px}
+  .cars{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;width:100%;margin-top:20px}
+  .slot{margin:0;position:relative;transition:opacity .5s ease,transform .5s ease}
+  .slot.fade{opacity:0;transform:scale(.96)}
+  .slot img{width:100%;max-width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:10px;
+            border:2px solid var(--gold);box-shadow:0 10px 26px rgba(0,0,0,.7),0 0 18px rgba(226,181,74,.25)}
+  .slot figcaption{font:600 12px Inter,sans-serif;color:#e9dcb5;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .podium{margin-top:18px;width:100%;padding:16px 10px 20px;border-radius:50%/42%;
+          background:radial-gradient(ellipse at 50% 30%,rgba(255,236,170,.14),rgba(0,0,0,0) 65%);
+          box-shadow:inset 0 -6px 0 var(--gold),inset 0 -9px 14px rgba(226,181,74,.45);display:grid;justify-items:center}
+  .pc{font:600 clamp(26px,8vw,36px)/1 Cinzel,Georgia,serif;letter-spacing:.02em}
+  .pamt{font:700 clamp(72px,22vw,104px)/1 'Bodoni Moda',Didot,Georgia,serif;margin-top:4px}
+  .pdn{font:600 clamp(26px,8vw,36px)/1 Cinzel,Georgia,serif;letter-spacing:.06em}
+  .oac{margin-top:12px;font:600 14px Inter,sans-serif;color:#e9dcb5}
+  .oac b{color:var(--gold)}
+  .go{margin-top:18px;display:block;width:100%;max-width:400px;text-decoration:none;color:#1a1004;
+      font:700 20px Cinzel,Georgia,serif;letter-spacing:.08em;padding:16px;border-radius:999px;
+      background:linear-gradient(180deg,var(--goldhi),var(--gold) 55%,#b9852a);box-shadow:0 6px 22px rgba(226,181,74,.35)}
+  .go:active{transform:translateY(2px)}
+  .contact{margin-top:20px;font:600 14px/1.7 Cinzel,Georgia,serif;letter-spacing:.14em;color:#f1e6c6}
+  .contact small{font-size:11px;letter-spacing:.2em}
+  .disc{margin:18px 0 0;font:400 11.5px/1.5 Inter,sans-serif;color:#b9ad8c;max-width:52ch;text-align:left}
+  .blank{background:#fde047;color:#1a1004;font-weight:700;padding:0 3px;border-radius:3px}
+  @media (prefers-reduced-motion:reduce){.slot{transition:none}}
+</style>
+</head>
+<body>
+<div class="sample">SAMPLE PREVIEW &mdash; example down amounts, not live</div>
+<section class="intro" id="intro" hidden>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="in">
+    <div class="ibrand">WALT'S AUTO SALES</div>
+    <div class="num"><span class="gold">31</span><sup class="gold">st</sup></div>
+    <div class="script">Anniversary</div>
+    <div class="lld">LOW LOW DOWN</div>
+    <div class="sale">ANNIVERSARY SALE</div>
+    <div class="cars" id="introCars">
+      <figure class="slot"><img alt=""><figcaption></figcaption></figure>
+      <figure class="slot"><img alt=""><figcaption></figcaption></figure>
+    </div>
+    <div class="podium">
+      <div class="pc" id="introCount">43 CARS UNDER</div>
+      <div class="pamt gold" id="introUnder">$2000</div>
+      <div class="pdn">DOWN</div>
+    </div>
+    <div class="oac">As low as <b id="introAmt">$900</b> down &middot; With approved credit</div>
+    <a class="go" href="#all">SEE THE CARS &rsaquo;</a>
+    <div class="contact">www.waltsautosales.net<br>325-658-9223<br><small>APPLY ONLINE &bull;&bull; DM FOR DETAILS</small></div>
+    <p class="disc tila"></p>
+  </div>
+</section>
+<div id="app" hidden>
+<header>
+  <div class="brand"><b>WALT'S AUTO SALES</b><a href="tel:325-658-9223">📞 325-658-9223</a></div>
+  <div class="hero">
+    <div class="kicker">San Angelo &middot; Drive today</div>
+    <h1 id="h1">Low <em>Down</em></h1>
+    <p id="sub">Pick your down payment and see what's on the lot right now.</p>
+  </div>
+</header>
+<nav><div class="in" id="nav"></div></nav>
+<main>
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+  <div class="cta">
+    <h2>Get pre-approved in minutes</h2>
+    <div>Apply online, then come pick your car.</div>
+    <a href="https://waltsautosales.net/creditapp">Apply now</a>
+  </div>
+  <p class="fine tila"></p>
+</main>
+</div>
+
+<script>
+(() => {
+  // SAMPLE rules - the real ones will come from a Google Sheet. Year blank = any year.
+  // More specific (with year) wins; stock # overrides beat everything.
+  const RULES = [
+    { year: 2024, model: 'Nissan Sentra',     down: 900 },
+    { year: 2025, model: 'Nissan Sentra',     down: 1200 },
+    {             model: 'Chevrolet Malibu',  down: 1000 },
+    { year: 2024, model: 'Nissan Altima',     down: 1400 },
+    { year: 2024, model: 'Nissan Rogue',      down: 1800 },
+  ];
+  const OVERRIDES = {}; // e.g. { '10492': 1400, '11644': null }
+
+  // Truth-in-lending disclosure. Advertising a down payment amount requires showing the
+  // down payment, the repayment terms and the APR. Fill these in from the real deal
+  // structure; anything left null shows as a highlighted blank so it can't go out unnoticed.
+  const TERMS = {
+    exampleCar: null,   // e.g. '2024 Nissan Sentra'
+    cashPrice: null,    // e.g. 18995
+    down: 900,
+    apr: null,          // e.g. 24.99
+    months: null,       // e.g. 36  (or describe weekly/biweekly below)
+    payments: null,     // number of payments, e.g. 36
+    payment: null,      // e.g. 489
+  };
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money = n => '$' + n.toLocaleString();
+
+  function disclosure(){
+    const t = TERMS, b = (v, label) => v == null ? `<span class="blank">[${label}]</span>` : esc(v);
+    const m = v => v == null ? null : money(v);
+    return `With approved credit. Example: ${b(t.exampleCar, 'EXAMPLE VEHICLE')} with a cash price of ${b(m(t.cashPrice), 'CASH PRICE')}, ` +
+      `${money(t.down)} down, financed at ${b(t.apr == null ? null : t.apr + '%', 'APR')} APR for ${b(t.months, 'TERM')} months: ` +
+      `${b(t.payments, '# OF')} monthly payments of ${b(m(t.payment), 'PAYMENT')}. Rate, terms and down payment depend on credit approval; ` +
+      `not all buyers qualify. Tax, title, license and fees extra. Vehicles subject to prior sale. See dealer for details. ` +
+      `Walt's Auto Sales, 1718 N Bryant Blvd, San Angelo TX.`;
+  }
+  document.querySelectorAll('.tila').forEach(el => el.innerHTML = disclosure());
+
+  function downFor(car){
+    if (car.stock in OVERRIDES) return OVERRIDES[car.stock];
+    const year = parseInt(car.title, 10);
+    const rest = car.title.replace(/^\d{4}\s+/, '').toLowerCase() + ' ';
+    let best = null;
+    for (const r of RULES) {
+      if (r.year && r.year !== year) continue;
+      if (!rest.startsWith(r.model.toLowerCase() + ' ')) continue;
+      if (!best || (r.year && !best.year)) best = r;
+    }
+    return best ? best.down : null;
+  }
+
+  async function load(){
+    const res = await fetch('inventory.json?t=' + Date.now(), { cache: 'no-store' });
+    const inv = await res.json();
+    const groups = {};
+    for (const car of inv.cars) {
+      const d = downFor(car);
+      if (d != null) (groups[d] ||= []).push(car);
+    }
+    const amounts = Object.keys(groups).map(Number).sort((a, b) => a - b);
+
+    const total = amounts.reduce((n, a) => n + groups[a].length, 0);
+
+    // Starting page: one tile per down-payment group.
+    function hub(){
+      $('nav').innerHTML = `<a href="#all" class="on">All groups<small>${total}</small></a>` +
+        amounts.map(a => `<a href="#${a}">${money(a)} down<small>${groups[a].length}</small></a>`).join('');
+      $('h1').innerHTML = `As low as <em>${money(amounts[0])}</em> Down`;
+      $('sub').innerHTML = `<b>With approved credit.</b> ${total} cars on our lot right now with low down payments. Pick the down payment that fits you.`;
+      $('count').textContent = '';
+      const models = cars => [...new Set(cars.map(c => c.title.split(' ').slice(1, 3).join(' ')))].slice(0, 4).join(' · ');
+      $('grid').className = 'tiles';
+      $('grid').innerHTML = amounts.map(a => {
+        const cars = groups[a];
+        const pics = cars.filter(c => c.img).slice(0, 3);
+        return `<a class="tile" href="#${a}">
+          <div class="top"><div class="amt"><span>${money(a)}</span><small>DOWN</small></div>
+            <div class="n">${cars.length} car${cars.length === 1 ? '' : 's'}</div></div>
+          <div class="pics">${pics.map(c => `<img src="${esc(c.img)}" alt="${esc(c.title)}" loading="lazy">`).join('')}</div>
+          <div class="models">${esc(models(cars))}</div>
+          <span class="go">See the ${money(a)} down cars ›</span></a>`;
+      }).join('') + `<div class="how" style="grid-column:1/-1">
+          <div><b>1</b>Pick your down payment</div><div><b>2</b>Apply online in minutes</div><div><b>3</b>Drive it home</div></div>`;
+      document.title = "Low Down Payment Cars — Walt's Auto Sales";
+    }
+
+    // Opening page (no hash): 31 years + lowest down + one big button.
+    // Headline ceiling ("UNDER $2000 DOWN"): next even thousand above the highest group.
+    const UNDER = Math.ceil((amounts[amounts.length - 1] + 1) / 1000) * 1000;
+    // Photos for the rotating pair: alternate across groups so every down amount shows up.
+    const reel = [];
+    for (let i = 0; reel.length < 40; i++) {
+      let added = false;
+      for (const a of amounts) { const c = groups[a].filter(c => c.img)[i]; if (c) { reel.push([c, a]); added = true; } }
+      if (!added) break;
+    }
+    let reelAt = 0, reelTimer = null;
+    function paintSlot(slot, [c, a]){
+      slot.querySelector('img').src = c.img;
+      slot.querySelector('img').alt = c.title;
+      slot.querySelector('figcaption').textContent = `${c.title.split(' ').slice(0, 3).join(' ')} · ${money(a)} down`;
+    }
+    function intro(){
+      $('introAmt').textContent = money(amounts[0]);
+      $('introUnder').textContent = '$' + UNDER;
+      $('introCount').textContent = `${total} CARS UNDER`;
+      const slots = [...document.querySelectorAll('#introCars .slot')];
+      slots.forEach((s, i) => reel[i] && paintSlot(s, reel[i]));
+      reelAt = 2;
+      clearInterval(reelTimer);
+      if (reel.length > 2 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        let side = 0;
+        reelTimer = setInterval(() => {
+          if ($('intro').hidden) return;
+          const s = slots[side];
+          s.classList.add('fade');
+          const next = reel[reelAt++ % reel.length];
+          setTimeout(() => { paintSlot(s, next); s.classList.remove('fade'); }, 500);
+          side = 1 - side;
+        }, 1800);
+      }
+      document.title = "Walt's Auto Sales — 31st Anniversary";
+    }
+
+    function show(){
+      const h = location.hash.slice(1);
+      $('intro').hidden = h !== '';
+      $('app').hidden = h === '';
+      if (h === '') return intro();
+      const want = Number(h);
+      if (!amounts.includes(want)) return hub();
+      const amt = want;
+      $('grid').className = 'grid';
+      $('nav').innerHTML = `<a href="#all">All groups<small>${total}</small></a>` + amounts.map(a =>
+        `<a href="#${a}" class="${a === amt ? 'on' : ''}">${money(a)} down<small>${groups[a].length}</small></a>`).join('');
+      $('h1').innerHTML = `<em>${money(amt)}</em> Down`;
+      $('sub').innerHTML = `<b>With approved credit.</b> Every car on our lot you can drive home for ${money(amt)} down.`;
+      const cars = (groups[amt] || []).slice().sort((a, b) => parseInt(b.title) - parseInt(a.title));
+      $('count').textContent = `${cars.length} car${cars.length === 1 ? '' : 's'} available · updated hourly`;
+      $('grid').innerHTML = cars.map(c => `
+        <article class="car">
+          <div class="ph">${c.img ? `<img src="${esc(c.img)}" alt="${esc(c.title)}" loading="lazy">` : ''}
+            <div class="badge">${money(amt)}<small>DOWN</small></div></div>
+          <div class="body">
+            <h3>${esc(c.title)}</h3>
+            <div class="meta">${esc(c.miles)} miles · Stock ${esc(c.stock)}</div>
+            <div class="btns"><a class="see" href="${esc(c.url)}">See details</a><a class="call" href="tel:325-658-9223">Call</a></div>
+          </div>
+        </article>`).join('') || '<div class="empty">No cars in this group right now — check back soon.</div>';
+      document.title = `${money(amt)} Down Cars — Walt's Auto Sales`;
+    }
+    window.addEventListener('hashchange', () => { show(); scrollTo(0, 0); });
+    show();
+  }
+  load();
+})();
+</script>
+</body>
+</html>
