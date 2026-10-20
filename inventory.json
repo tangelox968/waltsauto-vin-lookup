@@ -1,6 +1,6 @@
 {
- "checked": "2026-10-20T14:54:09Z",
- "count": 168,
+ "checked": "2026-10-20T19:06:41Z",
+ "count": 166,
  "cars": [
   {
    "vin": "5XYRG4LC9PG172726",
@@ -633,16 +633,6 @@
    "id": "24328321"
   },
   {
-   "vin": "1N4BL4DV6RN390721",
-   "stock": "11957",
-   "title": "2024 Nissan Altima SV FWD",
-   "miles": "62,173",
-   "price": "$24,995",
-   "url": "https://waltsautosales.net/vdp/24268118/Used-2024-Nissan-Altima-SV-FWD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
-   "id": "24268118"
-  },
-  {
    "vin": "1N4BL4DV6RN391464",
    "stock": "11958",
    "title": "2024 Nissan Altima SV FWD",
@@ -809,7 +799,7 @@
    "miles": "92,291",
    "price": "$21,995",
    "url": "https://waltsautosales.net/vdp/24417727/Used-2019-RAM-1500-Classic-Tradesman-Quad-Cab-2WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24417727/639280917764534533.jpg",
    "id": "24417727"
   },
   {
@@ -1439,7 +1429,7 @@
    "miles": "60,867",
    "price": "$23,995",
    "url": "https://waltsautosales.net/vdp/24380698/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24380698/639280939777559950.jpg",
    "id": "24380698"
   },
   {
@@ -1633,16 +1623,6 @@
    "id": "24417732"
   },
   {
-   "vin": "KMHRC8A39SU366942",
-   "stock": "12284",
-   "title": "2025 Hyundai Venue SEL",
-   "miles": "46,567",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24417733/Used-2025-Hyundai-Venue-SEL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
-   "id": "24417733"
-  },
-  {
    "vin": "1GKS2HKJ0JR164907",
    "stock": "12287",
    "title": "2018 GMC Yukon XL Denali 4WD",
@@ -1659,7 +1639,7 @@
    "miles": "133,344",
    "price": "$17,995",
    "url": "https://waltsautosales.net/vdp/24417734/Used-2022-Toyota-Corolla-LE-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24417734/639280923046726616.jpg",
    "id": "24417734"
   },
   {
