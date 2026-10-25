@@ -1,6 +1,6 @@
 {
- "checked": "2026-10-24T05:37:11Z",
- "count": 183,
+ "checked": "2026-10-25T05:51:55Z",
+ "count": 177,
  "cars": [
   {
    "vin": "5XYRG4LC9PG172726",
@@ -41,16 +41,6 @@
    "url": "https://waltsautosales.net/vdp/24309187/Used-2017-Chevrolet-Tahoe-LS-2WD-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24309187/639256710441040230.jpg",
    "id": "24309187"
-  },
-  {
-   "vin": "KMHD74LF3LU952097",
-   "stock": "10843B",
-   "title": "2020 Hyundai Elantra SE",
-   "miles": "133,188",
-   "price": "$13,995",
-   "url": "https://waltsautosales.net/vdp/24421607/Used-2020-Hyundai-Elantra-SE-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24421607/639281761900434377.jpg",
-   "id": "24421607"
   },
   {
    "vin": "1FMJU1NT7LEA13882",
@@ -101,16 +91,6 @@
    "url": "https://waltsautosales.net/vdp/24181812/Used-2015-Chevrolet-Tahoe-LS-2WD-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24181812/639221285486551526.jpg",
    "id": "24181812"
-  },
-  {
-   "vin": "2GNAXREV6J6133595",
-   "stock": "11235A",
-   "title": "2018 Chevrolet Equinox LS AWD",
-   "miles": "142,392",
-   "price": "$11,995",
-   "url": "https://waltsautosales.net/vdp/24365968/Used-2018-Chevrolet-Equinox-LS-AWD-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24365968/639281744300637631.jpg",
-   "id": "24365968"
   },
   {
    "vin": "5N1BT3AA7RC677501",
@@ -581,16 +561,6 @@
    "url": "https://waltsautosales.net/vdp/24248387/Used-2025-Kia-Telluride-S-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24248387/639246578947106476.jpg",
    "id": "24248387"
-  },
-  {
-   "vin": "1FMJU1HT9LEA76008",
-   "stock": "11899",
-   "title": "2020 Ford Expedition XLT",
-   "miles": "62,585",
-   "price": "$29,995",
-   "url": "https://waltsautosales.net/vdp/24395069/Used-2020-Ford-Expedition-XLT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24395069/639275759175921660.jpg",
-   "id": "24395069"
   },
   {
    "vin": "1GNSCAKC0LR105755",
@@ -1163,16 +1133,6 @@
    "id": "24337341"
   },
   {
-   "vin": "1FMSK7DH6NGB66917",
-   "stock": "12098",
-   "title": "2022 Ford Explorer XLT",
-   "miles": "29,508",
-   "price": "$32,995",
-   "url": "https://waltsautosales.net/vdp/24332847/Used-2022-Ford-Explorer-XLT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24332847/639275811582597463.jpg",
-   "id": "24332847"
-  },
-  {
    "vin": "1G1ZD5ST6RF153405",
    "stock": "12104",
    "title": "2024 Chevrolet Malibu FWD 1LT",
@@ -1181,16 +1141,6 @@
    "url": "https://waltsautosales.net/vdp/24361520/Used-2024-Chevrolet-Malibu-FWD-1LT-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24361520/639265381584179138.jpg",
    "id": "24361520"
-  },
-  {
-   "vin": "KL79MPSLXSB049562",
-   "stock": "12105",
-   "title": "2025 Chevrolet TrailBlazer FWD LT",
-   "miles": "49,920",
-   "price": "$24,995",
-   "url": "https://waltsautosales.net/vdp/24357121/Used-2025-Chevrolet-TrailBlazer-FWD-LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24357121/639268830044346218.jpg",
-   "id": "24357121"
   },
   {
    "vin": "1N4BL4DV8RN345232",
@@ -1713,16 +1663,6 @@
    "id": "24425745"
   },
   {
-   "vin": "1GKS2HKJ0JR164907",
-   "stock": "12287",
-   "title": "2018 GMC Yukon XL Denali 4WD",
-   "miles": "148,059",
-   "price": "$24,995",
-   "url": "https://waltsautosales.net/vdp/24407613/Used-2018-GMC-Yukon-XL-Denali-4WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24407613/639277427592995437.jpg",
-   "id": "24407613"
-  },
-  {
    "vin": "KM8HB3AB8SU248874",
    "stock": "12298",
    "title": "2025 Hyundai Kona SEL",
@@ -1813,14 +1753,14 @@
    "id": "24434276"
   },
   {
-   "vin": "1C4RDHDGXJC114279",
-   "stock": "12326",
-   "title": "2018 Dodge Durango GT 2WD",
-   "miles": "162,969",
-   "price": "$11,995",
-   "url": "https://waltsautosales.net/vdp/24434271/Used-2018-Dodge-Durango-GT-2WD-for-sale-in-San-Angelo-TX-76903",
+   "vin": "3GNAXKEG5PS173685",
+   "stock": "12330",
+   "title": "2023 Chevrolet Equinox LT 2WD",
+   "miles": "76,736",
+   "price": "$20,995",
+   "url": "https://waltsautosales.net/vdp/24436668/Used-2023-Chevrolet-Equinox-LT-2WD-for-sale-in-San-Angelo-TX-76903",
    "img": "",
-   "id": "24434271"
+   "id": "24436668"
   },
   {
    "vin": "1FMJK1LT6FEF28420",
