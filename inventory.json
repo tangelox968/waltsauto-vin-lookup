@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-25T05:51:55Z",
+ "checked": "2026-10-26T17:14:32Z",
  "count": 177,
  "cars": [
   {
@@ -209,7 +209,7 @@
    "miles": "137,748",
    "price": "$13,995",
    "url": "https://waltsautosales.net/vdp/24430119/Used-2019-Kia-Sorento-EX-V6-2WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24430119/639286111322627856.jpg",
    "id": "24430119"
   },
   {
@@ -429,7 +429,7 @@
    "miles": "83,986",
    "price": "$18,995",
    "url": "https://waltsautosales.net/vdp/24425742/Used-2020-Ford-Edge-SE-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24425742/639286067110194554.jpg",
    "id": "24425742"
   },
   {
@@ -759,7 +759,7 @@
    "miles": "158,799",
    "price": "$9,995",
    "url": "https://waltsautosales.net/vdp/24434272/Used-2017-Chevrolet-Malibu-1LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434272/639286065381636298.jpg",
    "id": "24434272"
   },
   {
@@ -1089,7 +1089,7 @@
    "miles": "52,448",
    "price": "$39,995",
    "url": "https://waltsautosales.net/vdp/24318175/Used-2025-Chevrolet-Silverado-1500-2WD-Crew-Cab-Short-Bed-LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24318175/639256703509829925.jpg",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24318175/639286059761594266.jpg",
    "id": "24318175"
   },
   {
@@ -1419,7 +1419,7 @@
    "miles": "56,584",
    "price": "$33,995",
    "url": "https://waltsautosales.net/vdp/24425743/Used-2025-Nissan-Pathfinder-SV-FWD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24425743/639286097456293980.jpg",
    "id": "24425743"
   },
   {
@@ -1599,7 +1599,7 @@
    "miles": "62,644",
    "price": "$24,995",
    "url": "https://waltsautosales.net/vdp/24434274/Used-2024-Toyota-Corolla-LE-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434274/639286099807296419.jpg",
    "id": "24434274"
   },
   {
@@ -1609,7 +1609,7 @@
    "miles": "56,908",
    "price": "$23,995",
    "url": "https://waltsautosales.net/vdp/24434273/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434273/639286108878263124.jpg",
    "id": "24434273"
   },
   {
@@ -1639,7 +1639,7 @@
    "miles": "46,567",
    "price": "$23,995",
    "url": "https://waltsautosales.net/vdp/24417733/Used-2025-Hyundai-Venue-SEL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24417733/639286106762657134.jpg",
    "id": "24417733"
   },
   {
@@ -1659,7 +1659,7 @@
    "miles": "45,551",
    "price": "$23,995",
    "url": "https://waltsautosales.net/vdp/24425745/Used-2025-Nissan-Versa-16-SV-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24425745/639286104530621684.jpg",
    "id": "24425745"
   },
   {
@@ -1739,7 +1739,7 @@
    "miles": "41,100",
    "price": "$20,995",
    "url": "https://waltsautosales.net/vdp/24434275/Used-2022-Hyundai-Sonata-SE-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434275/639286074955005731.jpg",
    "id": "24434275"
   },
   {
@@ -1749,7 +1749,7 @@
    "miles": "74,854",
    "price": "$22,995",
    "url": "https://waltsautosales.net/vdp/24434276/Used-2023-Hyundai-Sonata-SEL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434276/639286120227838298.jpg",
    "id": "24434276"
   },
   {
@@ -1759,7 +1759,7 @@
    "miles": "76,736",
    "price": "$20,995",
    "url": "https://waltsautosales.net/vdp/24436668/Used-2023-Chevrolet-Equinox-LT-2WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24436668/639286070692325779.jpg",
    "id": "24436668"
   },
   {
