@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-28T23:04:35Z",
+ "checked": "2026-10-29T09:44:18Z",
  "count": 176,
  "cars": [
   {
@@ -283,6 +283,16 @@
    "id": "24186127"
   },
   {
+   "vin": "KMHLN4AJ5NU031043",
+   "stock": "11684",
+   "title": "2022 Hyundai Elantra Hybrid Limited",
+   "miles": "46,065",
+   "price": "$19,995",
+   "url": "https://waltsautosales.net/vdp/24448537/Used-2022-Hyundai-Elantra-Hybrid-Limited-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24448537"
+  },
+  {
    "vin": "3N1AB8BV5RY247204",
    "stock": "11692",
    "title": "2024 Nissan Sentra S Xtronic CVT",
@@ -341,16 +351,6 @@
    "url": "https://waltsautosales.net/vdp/24181817/Used-2023-Chrysler-Voyager-LX-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24181817/639221300049467897.jpg",
    "id": "24181817"
-  },
-  {
-   "vin": "3N1CN8DV6RL929728",
-   "stock": "11716",
-   "title": "2024 Nissan Versa 1.6 S",
-   "miles": "43,889",
-   "price": "$21,995",
-   "url": "https://waltsautosales.net/vdp/24210313/Used-2024-Nissan-Versa-16-S-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24210313/639229948067314143.jpg",
-   "id": "24210313"
   },
   {
    "vin": "1N4BL4BV1RN434577",
@@ -473,16 +473,6 @@
    "id": "24190526"
   },
   {
-   "vin": "1G1ZD5ST6RF161536",
-   "stock": "11827",
-   "title": "2024 Chevrolet Malibu FWD 1LT",
-   "miles": "64,184",
-   "price": "$24,995",
-   "url": "https://waltsautosales.net/vdp/24199856/Used-2024-Chevrolet-Malibu-FWD-1LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24199856/639227327656932554.jpg",
-   "id": "24199856"
-  },
-  {
    "vin": "5N1BT3BA1SC787190",
    "stock": "11851",
    "title": "2025 Nissan Rogue SV FWD",
@@ -531,16 +521,6 @@
    "url": "https://waltsautosales.net/vdp/24380694/Used-2024-Nissan-Altima-SV-FWD-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24380694/639277469795154520.jpg",
    "id": "24380694"
-  },
-  {
-   "vin": "1N4BL4DV4PN312063",
-   "stock": "11883A",
-   "title": "2023 Nissan Altima SV FWD",
-   "miles": "68,457",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24407612/Used-2023-Nissan-Altima-SV-FWD-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24407612/639279217334751271.jpg",
-   "id": "24407612"
   },
   {
    "vin": "5XYP64GC3SG626157",
@@ -731,6 +711,16 @@
    "url": "https://waltsautosales.net/vdp/24341692/Used-2025-Chevrolet-Equinox-FWD-LT-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24341692/639265360003134757.jpg",
    "id": "24341692"
+  },
+  {
+   "vin": "3N1AB8BV9SY284164",
+   "stock": "11978",
+   "title": "2025 Nissan Sentra S",
+   "miles": "37,860",
+   "price": "$23,995",
+   "url": "https://waltsautosales.net/vdp/24448534/Used-2025-Nissan-Sentra-S-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24448534"
   },
   {
    "vin": "3GNAXHEGXSL250928",
@@ -1373,14 +1363,24 @@
    "id": "24389082"
   },
   {
-   "vin": "3N1AB8CV7RY356133",
-   "stock": "12197",
-   "title": "2024 Nissan Sentra SV Xtronic CVT",
-   "miles": "60,867",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24380698/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24380698/639280939777559950.jpg",
-   "id": "24380698"
+   "vin": "3GCPCREC0FG371404",
+   "stock": "12202",
+   "title": "2015 Chevrolet Silverado 1500 LT Crew Cab 2WD",
+   "miles": "138,910",
+   "price": "$20,995",
+   "url": "https://waltsautosales.net/vdp/24368421/Used-2015-Chevrolet-Silverado-1500-LT-Crew-Cab-2WD-for-sale-in-San-Angelo-TX-76903",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24368421/639268823272360520.jpg",
+   "id": "24368421"
+  },
+  {
+   "vin": "2GNALCEK0H1509567",
+   "stock": "12208",
+   "title": "2017 Chevrolet Equinox LT",
+   "miles": "55,837",
+   "price": "$17,995",
+   "url": "https://waltsautosales.net/vdp/24448535/Used-2017-Chevrolet-Equinox-LT-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24448535"
   },
   {
    "vin": "1N4BL4CV0RN352533",
@@ -1533,16 +1533,6 @@
    "id": "24421605"
   },
   {
-   "vin": "JTMW1RFV5KD036275",
-   "stock": "12248",
-   "title": "2019 Toyota RAV4 XLE",
-   "miles": "94,789",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24391514/Used-2019-Toyota-RAV4-XLE-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24391514/639279284977422613.jpg",
-   "id": "24391514"
-  },
-  {
    "vin": "1G1ZD5ST0RF130475",
    "stock": "12252",
    "title": "2024 Chevrolet Malibu FWD 1LT",
@@ -1661,6 +1651,16 @@
    "url": "https://waltsautosales.net/vdp/24425746/Used-2025-Hyundai-Kona-SEL-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24425746/639283465645571210.jpg",
    "id": "24425746"
+  },
+  {
+   "vin": "3N1CN8DV6RL926067",
+   "stock": "12300",
+   "title": "2024 Nissan Versa 1.6 S",
+   "miles": "52,366",
+   "price": "$22,995",
+   "url": "https://waltsautosales.net/vdp/24448536/Used-2024-Nissan-Versa-16-S-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24448536"
   },
   {
    "vin": "1GNSCBKC9GR134442",
