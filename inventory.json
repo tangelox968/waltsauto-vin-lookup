@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-01T09:01:30Z",
+ "checked": "2026-11-03T09:20:35Z",
  "count": 173,
  "cars": [
   {
@@ -1143,6 +1143,16 @@
    "id": "24414228"
   },
   {
+   "vin": "3N1CN8DV2SL833522",
+   "stock": "12138",
+   "title": "2025 Nissan Versa 1.6 S",
+   "miles": "38,684",
+   "price": "$22,995",
+   "url": "https://waltsautosales.net/vdp/24463040/Used-2025-Nissan-Versa-16-S-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24463040"
+  },
+  {
    "vin": "1C4SJUBP3RS178316",
    "stock": "12139",
    "title": "2024 Jeep Wagoneer Series II 4x2",
@@ -1473,6 +1483,16 @@
    "id": "24421605"
   },
   {
+   "vin": "3N1AB8CV2RY356041",
+   "stock": "12246",
+   "title": "2024 Nissan Sentra SV Xtronic CVT",
+   "miles": "50,950",
+   "price": "$23,995",
+   "url": "https://waltsautosales.net/vdp/24463041/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24463041"
+  },
+  {
    "vin": "1G1ZD5ST0RF130475",
    "stock": "12252",
    "title": "2024 Chevrolet Malibu FWD 1LT",
@@ -1633,16 +1653,6 @@
    "id": "24430120"
   },
   {
-   "vin": "3N1AB8CV2PY260469",
-   "stock": "12320",
-   "title": "2023 Nissan Sentra SV Xtronic CVT",
-   "miles": "62,908",
-   "price": "$21,995",
-   "url": "https://waltsautosales.net/vdp/24430121/Used-2023-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24430121/639283497335283057.jpg",
-   "id": "24430121"
-  },
-  {
    "vin": "KMHL64JA7PA291977",
    "stock": "12325",
    "title": "2023 Hyundai Sonata SEL",
@@ -1661,16 +1671,6 @@
    "url": "https://waltsautosales.net/vdp/24436668/Used-2023-Chevrolet-Equinox-LT-2WD-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24436668/639286070692325779.jpg",
    "id": "24436668"
-  },
-  {
-   "vin": "3KPF24AD8NE485581",
-   "stock": "12374",
-   "title": "2022 Kia Forte FE",
-   "miles": "57,737",
-   "price": "$20,995",
-   "url": "https://waltsautosales.net/vdp/24453043/Used-2022-Kia-Forte-FE-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
-   "id": "24453043"
   },
   {
    "vin": "3GCPWCEDXKG140257",
