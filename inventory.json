@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-06T14:54:47Z",
+ "checked": "2026-11-06T20:47:47Z",
  "count": 189,
  "cars": [
   {
@@ -119,7 +119,7 @@
    "miles": "118,918",
    "price": "$29,995",
    "url": "https://waltsautosales.net/vdp/24466803/Used-2016-Toyota-Tundra-2WD-Truck-SR5-57L-V8-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466803/639295577513208575.jpg",
    "id": "24466803"
   },
   {
@@ -159,7 +159,7 @@
    "miles": "67,817",
    "price": "$34,995",
    "url": "https://waltsautosales.net/vdp/24444227/Used-2021-Ford-Expedition-Limited-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24444227/639295594305483756.jpg",
    "id": "24444227"
   },
   {
@@ -249,7 +249,7 @@
    "miles": "90,212",
    "price": "$24,995",
    "url": "https://waltsautosales.net/vdp/24475148/Used-2021-RAM-1500-Classic-Tradesman-Crew-Cab-SWB-4WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24475148/639295572799417187.jpg",
    "id": "24475148"
   },
   {
@@ -479,7 +479,7 @@
    "miles": "116,670",
    "price": "$27,995",
    "url": "https://waltsautosales.net/vdp/24470992/Used-2021-Ford-Expedition-Max-XLT-MAX-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24470992/639295581826414652.jpg",
    "id": "24470992"
   },
   {
@@ -569,7 +569,7 @@
    "miles": "130,691",
    "price": "$22,995",
    "url": "https://waltsautosales.net/vdp/24444228/Used-2019-Ford-Expedition-XLT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24444228/639295596972096862.jpg",
    "id": "24444228"
   },
   {
@@ -1169,7 +1169,7 @@
    "miles": "44,541",
    "price": "$35,995",
    "url": "https://waltsautosales.net/vdp/24453040/Used-2022-Chevrolet-Silverado-1500-Custom-Crew-Cab-4WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24453040/639295566116860444.jpg",
    "id": "24453040"
   },
   {
@@ -1189,7 +1189,7 @@
    "miles": "107,031",
    "price": "$32,995",
    "url": "https://waltsautosales.net/vdp/24475149/Used-2020-Ford-F150-King-Ranch-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24475149/639295588935581925.jpg",
    "id": "24475149"
   },
   {
@@ -1229,7 +1229,7 @@
    "miles": "162,153",
    "price": "$19,995",
    "url": "https://waltsautosales.net/vdp/24466792/Used-2021-Ford-Expedition-Max-MAX-Limited-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466792/639295599195865619.jpg",
    "id": "24466792"
   },
   {
@@ -1839,7 +1839,7 @@
    "miles": "79,223",
    "price": "$25,995",
    "url": "https://waltsautosales.net/vdp/24466793/Used-2019-Ford-F150-XL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466793/639295569131755031.jpg",
    "id": "24466793"
   },
   {
