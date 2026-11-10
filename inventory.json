@@ -1,6 +1,6 @@
 {
- "checked": "2026-11-08T10:05:10Z",
- "count": 184,
+ "checked": "2026-11-10T09:34:16Z",
+ "count": 181,
  "cars": [
   {
    "vin": "5XYRG4LC9PG172726",
@@ -301,16 +301,6 @@
    "url": "https://waltsautosales.net/vdp/24186127/Used-2024-Nissan-Rogue-S-FWD-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24186127/639229915386263806.jpg",
    "id": "24186127"
-  },
-  {
-   "vin": "KMHLN4AJ5NU031043",
-   "stock": "11684",
-   "title": "2022 Hyundai Elantra Hybrid Limited",
-   "miles": "46,065",
-   "price": "$19,995",
-   "url": "https://waltsautosales.net/vdp/24448537/Used-2022-Hyundai-Elantra-Hybrid-Limited-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24448537/639290412322541169.jpg",
-   "id": "24448537"
   },
   {
    "vin": "5LMCJ2C92NUL18663",
@@ -1293,16 +1283,6 @@
    "id": "24380693"
   },
   {
-   "vin": "1FTFW1E55NFB14163",
-   "stock": "12162",
-   "title": "2022 Ford F-150 XL",
-   "miles": "116,654",
-   "price": "$26,995",
-   "url": "https://waltsautosales.net/vdp/24479138/Used-2022-Ford-F150-XL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
-   "id": "24479138"
-  },
-  {
    "vin": "1FMSK7FH4PGA59414",
    "stock": "12164",
    "title": "2023 Ford Explorer Limited",
@@ -1393,6 +1373,16 @@
    "id": "24365970"
   },
   {
+   "vin": "5XYP34HC1NG210975",
+   "stock": "12188",
+   "title": "2022 Kia Telluride EX",
+   "miles": "123,840",
+   "price": "$22,995",
+   "url": "https://waltsautosales.net/vdp/24484861/Used-2022-Kia-Telluride-EX-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24484861"
+  },
+  {
    "vin": "2C4RC1BG6PR602447",
    "stock": "12192",
    "title": "2023 Chrysler Pacifica Touring L",
@@ -1461,16 +1451,6 @@
    "url": "https://waltsautosales.net/vdp/24385146/Used-2025-Hyundai-Kona-SEL-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24385146/639275890970723377.jpg",
    "id": "24385146"
-  },
-  {
-   "vin": "1G1ZD5ST6RF170494",
-   "stock": "12219",
-   "title": "2024 Chevrolet Malibu FWD 1LT",
-   "miles": "49,890",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24399018/Used-2024-Chevrolet-Malibu-FWD-1LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24399018/639275732451176148.jpg",
-   "id": "24399018"
   },
   {
    "vin": "3N1AB8CV9RY330200",
@@ -1571,16 +1551,6 @@
    "url": "https://waltsautosales.net/vdp/24403398/Used-2024-Chevrolet-Malibu-FWD-1LT-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24403398/639276751094280840.jpg",
    "id": "24403398"
-  },
-  {
-   "vin": "3N1AB8CV9RY371930",
-   "stock": "12253",
-   "title": "2024 Nissan Sentra SV Xtronic CVT",
-   "miles": "50,374",
-   "price": "$23,995",
-   "url": "https://waltsautosales.net/vdp/24466800/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
-   "id": "24466800"
   },
   {
    "vin": "1FMCU0GN4SUB32379",
@@ -1693,24 +1663,14 @@
    "id": "24430120"
   },
   {
-   "vin": "KMHL64JA7PA291977",
-   "stock": "12325",
-   "title": "2023 Hyundai Sonata SEL",
-   "miles": "74,854",
-   "price": "$22,995",
-   "url": "https://waltsautosales.net/vdp/24434276/Used-2023-Hyundai-Sonata-SEL-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24434276/639286120227838298.jpg",
-   "id": "24434276"
-  },
-  {
-   "vin": "3GNAXKEG5PS173685",
-   "stock": "12330",
-   "title": "2023 Chevrolet Equinox LT 2WD",
-   "miles": "76,736",
-   "price": "$20,995",
-   "url": "https://waltsautosales.net/vdp/24436668/Used-2023-Chevrolet-Equinox-LT-2WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24436668/639286070692325779.jpg",
-   "id": "24436668"
+   "vin": "3C4PDCAB3LT249761",
+   "stock": "12329",
+   "title": "2020 Dodge Journey SE Value",
+   "miles": "90,915",
+   "price": "$15,995",
+   "url": "https://waltsautosales.net/vdp/24484862/Used-2020-Dodge-Journey-SE-Value-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24484862"
   },
   {
    "vin": "KMHLM4DG2SU079064",
@@ -1831,6 +1791,16 @@
    "url": "https://waltsautosales.net/vdp/24475153/Used-2022-Hyundai-Accent-SE-for-sale-in-San-Angelo-TX-76903",
    "img": "",
    "id": "24475153"
+  },
+  {
+   "vin": "3C4PDCGG2KT763568",
+   "stock": "12426",
+   "title": "2019 Dodge Journey Crossroad FWD",
+   "miles": "89,916",
+   "price": "$12,995",
+   "url": "https://waltsautosales.net/vdp/24484863/Used-2019-Dodge-Journey-Crossroad-FWD-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24484863"
   },
   {
    "vin": "1FMJK1LT6FEF28420",
