@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-10T09:34:16Z",
+ "checked": "2026-11-10T17:37:38Z",
  "count": 181,
  "cars": [
   {
@@ -29,7 +29,7 @@
    "miles": "93,725",
    "price": "$27,995",
    "url": "https://waltsautosales.net/vdp/24444226/Used-2021-RAM-1500-Big-Horn-Quad-Cab-4WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24444226/639299037756648501.jpg",
    "id": "24444226"
   },
   {
@@ -569,7 +569,7 @@
    "miles": "57,306",
    "price": "$29,995",
    "url": "https://waltsautosales.net/vdp/24466791/Used-2024-RAM-1500-Classic-SLT-Quad-Cab-4x2-64-Box-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466791/639299041049000289.jpg",
    "id": "24466791"
   },
   {
@@ -1109,7 +1109,7 @@
    "miles": "49,361",
    "price": "$20,995",
    "url": "https://waltsautosales.net/vdp/24453038/Used-2021-Ford-Explorer-XLT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24453038/639299031404131696.jpg",
    "id": "24453038"
   },
   {
@@ -1129,7 +1129,7 @@
    "miles": "157,167",
    "price": "$25,995",
    "url": "https://waltsautosales.net/vdp/24470994/Used-2019-GMC-Sierra-1500-SLT-Crew-Cab-Short-Box-4WD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24470994/639299072319086628.jpg",
    "id": "24470994"
   },
   {
@@ -1299,7 +1299,7 @@
    "miles": "140,573",
    "price": "$22,995",
    "url": "https://waltsautosales.net/vdp/24479139/Used-2022-Ford-F150-XL-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24479139/639299034688556489.jpg",
    "id": "24479139"
   },
   {
@@ -1319,7 +1319,7 @@
    "miles": "118,937",
    "price": "$39,995",
    "url": "https://waltsautosales.net/vdp/24470995/Used-2021-Chevrolet-Tahoe-2WD-RST-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24470995/639299030221457102.jpg",
    "id": "24470995"
   },
   {
@@ -1489,7 +1489,7 @@
    "miles": "110,537",
    "price": "$19,995",
    "url": "https://waltsautosales.net/vdp/24466799/Used-2021-GMC-Terrain-FWD-SLT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466799/639299080827975200.jpg",
    "id": "24466799"
   },
   {
@@ -1539,7 +1539,7 @@
    "miles": "51,335",
    "price": "$23,995",
    "url": "https://waltsautosales.net/vdp/24466795/Used-2024-Chevrolet-Malibu-FWD-1LT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466795/639299067256374791.jpg",
    "id": "24466795"
   },
   {
@@ -1729,7 +1729,7 @@
    "miles": "77,043",
    "price": "$25,995",
    "url": "https://waltsautosales.net/vdp/24466802/Used-2022-Dodge-Challenger-GT-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24466802/639299045451909638.jpg",
    "id": "24466802"
   },
   {
@@ -1779,7 +1779,7 @@
    "miles": "112,939",
    "price": "$13,995",
    "url": "https://waltsautosales.net/vdp/24475152/Used-2020-Chevrolet-Equinox-1FL-AWD-for-sale-in-San-Angelo-TX-76903",
-   "img": "",
+   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24475152/639299079102292201.jpg",
    "id": "24475152"
   },
   {
