@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-12T23:29:18Z",
+ "checked": "2026-11-13T15:15:15Z",
  "count": 182,
  "cars": [
   {
@@ -61,6 +61,16 @@
    "url": "https://waltsautosales.net/vdp/24186122/Used-2020-Ford-Expedition-King-Ranch-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24186122/639287974689453326.jpg",
    "id": "24186122"
+  },
+  {
+   "vin": "1C6RR6GG7HS645156",
+   "stock": "10983A",
+   "title": "2017 RAM 1500 SLT Quad Cab 2WD",
+   "miles": "145,723",
+   "price": "$16,995",
+   "url": "https://waltsautosales.net/vdp/24496525/Used-2017-RAM-1500-SLT-Quad-Cab-2WD-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24496525"
   },
   {
    "vin": "1G1ZD5ST6PF196610",
@@ -227,7 +237,7 @@
    "stock": "11628A",
    "title": "2022 Hyundai Sonata SE",
    "miles": "79,862",
-   "price": "Call for Price",
+   "price": "$20,995",
    "url": "https://waltsautosales.net/vdp/24492454/Used-2022-Hyundai-Sonata-SE-for-sale-in-San-Angelo-TX-76903",
    "img": "",
    "id": "24492454"
@@ -873,16 +883,6 @@
    "id": "24304271"
   },
   {
-   "vin": "3N1CP5DV6ML553517",
-   "stock": "12042",
-   "title": "2021 Nissan Kicks SR Xtronic CVT",
-   "miles": "66,922",
-   "price": "$17,995",
-   "url": "https://waltsautosales.net/vdp/24475150/Used-2021-Nissan-Kicks-SR-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24475150/639300818749782973.jpg",
-   "id": "24475150"
-  },
-  {
    "vin": "1G1ZD5ST1SF134136",
    "stock": "12043",
    "title": "2025 Chevrolet Malibu FWD 1LT",
@@ -1113,21 +1113,11 @@
    "id": "24470994"
   },
   {
-   "vin": "1FTEW1E58LFC05274",
-   "stock": "12118",
-   "title": "2020 Ford F-150 King Ranch",
-   "miles": "107,031",
-   "price": "$32,995",
-   "url": "https://waltsautosales.net/vdp/24475149/Used-2020-Ford-F150-King-Ranch-for-sale-in-San-Angelo-TX-76903",
-   "img": "https://imagescdn.dealercarsearch.com/Media/11799/24475149/639295588935581925.jpg",
-   "id": "24475149"
-  },
-  {
    "vin": "3GCUYDED1LG361069",
    "stock": "12123A_1",
    "title": "2020 Chevrolet Silverado 1500 4WD Crew Cab Short Bed LT",
    "miles": "110,377",
-   "price": "Call for Price",
+   "price": "$28,995",
    "url": "https://waltsautosales.net/vdp/24492452/Used-2020-Chevrolet-Silverado-1500-4WD-Crew-Cab-Short-Bed-LT-for-sale-in-San-Angelo-TX-76903",
    "img": "https://imagescdn.dealercarsearch.com/Media/11799/24492452/639300826487783484.jpg",
    "id": "24492452"
@@ -1811,6 +1801,16 @@
    "url": "https://waltsautosales.net/vdp/24492453/Used-2024-Nissan-Sentra-SV-Xtronic-CVT-for-sale-in-San-Angelo-TX-76903",
    "img": "",
    "id": "24492453"
+  },
+  {
+   "vin": "1GKS2CKJ9HR270107",
+   "stock": "12464",
+   "title": "2017 GMC Yukon 4WD",
+   "miles": "132,673",
+   "price": "$24,995",
+   "url": "https://waltsautosales.net/vdp/24496526/Used-2017-GMC-Yukon-4WD-for-sale-in-San-Angelo-TX-76903",
+   "img": "",
+   "id": "24496526"
   },
   {
    "vin": "1FMJK1LT6FEF28420",
